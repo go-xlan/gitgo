@@ -14,7 +14,7 @@ func TestGitCmx_Status(t *testing.T) {
 		MustDone()
 }
 
-func TestGitCmx_Commit(t *testing.T) {
+func TestGitCmx_Submit(t *testing.T) {
 	gcx := gogitxexec.New(runpath.PARENT.Path())
 
 	gcx.WithDebug().

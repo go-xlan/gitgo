@@ -5,6 +5,7 @@ go 1.22.8
 require (
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.9.0
+	github.com/yyle88/eroticgo v0.0.0
 	github.com/yyle88/osexec v0.0.1
 	github.com/yyle88/runpath v1.0.9
 	github.com/yyle88/zaplog v0.0.13

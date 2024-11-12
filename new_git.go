@@ -1,6 +1,7 @@
 package gogitxexec
 
 import (
+	"github.com/yyle88/eroticgo"
 	"github.com/yyle88/osexec"
 	"github.com/yyle88/zaplog"
 )
@@ -18,10 +19,10 @@ func New(path string) *GitCmx {
 
 func newOK(cmx *osexec.CMX, data []byte, deb bool) *GitCmx {
 	if deb {
-		if len(data) == 0 {
-			zaplog.ZAPS.P3.SUG.Debugln("done", "\n", "-")
+		if len(data) > 0 {
+			zaplog.ZAPS.P3.SUG.Debugln("done", "message:", "\n"+eroticgo.GREEN.Sprint(string(data))+"\n", "-")
 		} else {
-			zaplog.ZAPS.P3.SUG.Debugln("done", "data:", "\n", string(data), "\n", "-")
+			zaplog.ZAPS.P3.SUG.Debugln("done", "\n", "-")
 		}
 	}
 	return &GitCmx{
@@ -34,10 +35,10 @@ func newOK(cmx *osexec.CMX, data []byte, deb bool) *GitCmx {
 
 func newWa(cmx *osexec.CMX, data []byte, erx error, deb bool) *GitCmx {
 	if deb {
-		if len(data) == 0 {
-			zaplog.ZAPS.P3.SUG.Errorln("wrong", erx)
+		if len(data) > 0 {
+			zaplog.ZAPS.P3.SUG.Errorln("wrong", eroticgo.RED.Sprint(erx), "message:", "\n"+eroticgo.RED.Sprint(string(data))+"\n", "-")
 		} else {
-			zaplog.ZAPS.P3.SUG.Errorln("wrong", erx, "data:", "\n", string(data), "\n", "-")
+			zaplog.ZAPS.P3.SUG.Errorln("wrong", eroticgo.RED.Sprint(erx))
 		}
 	}
 	return &GitCmx{
@@ -73,11 +74,11 @@ func (G *GitCmx) WithDebug() *GitCmx {
 func (G *GitCmx) ShowDebug() *GitCmx {
 	switch {
 	case G.Erx != nil && len(G.Out) > 0:
-		zaplog.ZAPS.P1.SUG.Errorln("wrong", G.Erx, "data:", "\n", string(G.Out), "\n", "-")
+		zaplog.ZAPS.P1.SUG.Errorln("wrong", eroticgo.RED.Sprint(G.Erx), "message:", "\n"+eroticgo.RED.Sprint(string(G.Out))+"\n", "-")
 	case G.Erx != nil:
-		zaplog.ZAPS.P1.SUG.Errorln("wrong", G.Erx, "\n", "-")
+		zaplog.ZAPS.P1.SUG.Errorln("wrong", eroticgo.RED.Sprint(G.Erx), "\n", "-")
 	case len(G.Out) > 0:
-		zaplog.ZAPS.P1.SUG.Debugln("done", "data:", "\n", string(G.Out), "\n", "-")
+		zaplog.ZAPS.P1.SUG.Debugln("done", "message:", "\n"+eroticgo.GREEN.Sprint(string(G.Out))+"\n", "-")
 	default:
 		zaplog.ZAPS.P1.SUG.Debugln("done", "\n", "-")
 	}
@@ -86,7 +87,11 @@ func (G *GitCmx) ShowDebug() *GitCmx {
 
 func (G *GitCmx) MustDone() *GitCmx {
 	if G.Erx != nil {
-		zaplog.ZAPS.P1.SUG.Panicln("wrong", G.Erx, "data:", "\n", string(G.Out), "\n", "-")
+		if len(G.Out) > 0 {
+			zaplog.ZAPS.P1.SUG.Panicln("wrong", eroticgo.RED.Sprint(G.Erx), "message:", "\n"+eroticgo.RED.Sprint(string(G.Out))+"\n", "-")
+		} else {
+			zaplog.ZAPS.P1.SUG.Panicln("wrong", eroticgo.RED.Sprint(G.Erx), "\n", "-")
+		}
 	}
 	return G
 }
