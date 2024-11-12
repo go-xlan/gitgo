@@ -34,7 +34,11 @@ func newOK(cmx *osexec.CMX, data []byte, deb bool) *GitCmx {
 
 func newWa(cmx *osexec.CMX, data []byte, erx error, deb bool) *GitCmx {
 	if deb {
-		zaplog.ZAPS.P3.SUG.Errorln("wrong", erx, "data:", "\n", string(data), "\n", "-")
+		if len(data) == 0 {
+			zaplog.ZAPS.P3.SUG.Errorln("wrong", erx)
+		} else {
+			zaplog.ZAPS.P3.SUG.Errorln("wrong", erx, "data:", "\n", string(data), "\n", "-")
+		}
 	}
 	return &GitCmx{
 		Cmx: cmx,
@@ -89,6 +93,15 @@ func (G *GitCmx) MustDone() *GitCmx {
 
 func (G *GitCmx) When(condition func(*GitCmx) bool, run func(*GitCmx) *GitCmx) *GitCmx {
 	if condition(G) {
+		return run(G)
+	}
+	return G
+}
+
+func (G *GitCmx) WhenExec(condition func(*GitCmx) (bool, error), run func(*GitCmx) *GitCmx) *GitCmx {
+	if ok, err := condition(G); err != nil {
+		return newWa(G.Cmx, nil, err, G.DBG)
+	} else if ok {
 		return run(G)
 	}
 	return G
