@@ -20,7 +20,10 @@ func TestGitCmx_Commit(t *testing.T) {
 	gcx.WithDebug().
 		Status().
 		Add().
-		Commit("提交代码").
-		Push().
+		When(func(cmx *gogitxexec.GitCmx) bool {
+			return cmx.CheckStagingChanges()
+		}, func(cmx *gogitxexec.GitCmx) *gogitxexec.GitCmx {
+			return cmx.Commit("提交代码").Push()
+		}).
 		MustDone()
 }

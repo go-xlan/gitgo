@@ -86,3 +86,10 @@ func (G *GitCmx) MustDone() *GitCmx {
 	}
 	return G
 }
+
+func (G *GitCmx) When(condition func(*GitCmx) bool, run func(*GitCmx) *GitCmx) *GitCmx {
+	if condition(G) {
+		return run(G)
+	}
+	return G
+}
