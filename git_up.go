@@ -2,8 +2,8 @@ package gogitxexec
 
 import "github.com/pkg/errors"
 
-func (G *GitCmx) CheckStagingChanges() (bool, error) {
-	if data, err := G.Cmx.Exec("git", "diff-index", "--cached", "--quiet", "HEAD"); err != nil {
+func (G *Gcm) CheckStagingChanges() (bool, error) {
+	if data, err := G.Cmc.Exec("git", "diff-index", "--cached", "--quiet", "HEAD"); err != nil {
 		if len(data) != 0 {
 			return false, errors.New(string(data))
 		}

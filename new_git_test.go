@@ -1,18 +1,19 @@
 package gogitxexec_test
 
 import (
+	"testing"
+
 	"github.com/go-xlan/gogitxexec"
 	"github.com/yyle88/osexec"
 	"github.com/yyle88/runpath"
-	"testing"
 )
 
-func TestGitCmx_UpdateCmx(t *testing.T) {
-	gcx := gogitxexec.New(runpath.PARENT.Path())
+func TestGcm_UpdateCmc(t *testing.T) {
+	gcm := gogitxexec.New(runpath.PARENT.Path())
 
-	gcx.WithDebug().
-		UpdateCmx(func(cmx *osexec.CMX) {
-			cmx.WithShellType("bash").WithShellFlag("-c")
+	gcm.WithDebug().
+		UpdateCmc(func(cmc *osexec.CMC) {
+			cmc.WithShellType("bash").WithShellFlag("-c")
 		}).
 		Add().
 		ShowDebug().

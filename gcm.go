@@ -1,70 +1,70 @@
 package gogitxexec
 
-func (G *GitCmx) Status() *GitCmx {
+func (G *Gcm) Status() *Gcm {
 	return G.do("git", "status")
 }
 
-func (G *GitCmx) Add() *GitCmx {
+func (G *Gcm) Add() *Gcm {
 	return G.do("git", "add", ".")
 }
 
-func (G *GitCmx) Commit(m string) *GitCmx {
+func (G *Gcm) Commit(m string) *Gcm {
 	//当没有待提交文件时，这里也会报错，目前暂无解决方案。
 	return G.do("git", "commit", "-m", m)
 }
 
-func (G *GitCmx) Pull() *GitCmx {
+func (G *Gcm) Pull() *Gcm {
 	return G.do("git", "pull")
 }
 
-func (G *GitCmx) Push() *GitCmx {
+func (G *Gcm) Push() *Gcm {
 	return G.do("git", "push")
 }
 
-func (G *GitCmx) PushSetUpstreamOriginBranch(newBranchName string) *GitCmx {
+func (G *Gcm) PushSetUpstreamOriginBranch(newBranchName string) *Gcm {
 	return G.do("git", "push", "--set-upstream", "origin", newBranchName)
 }
 
-func (G *GitCmx) Reset() *GitCmx {
+func (G *Gcm) Reset() *Gcm {
 	return G.do("git", "reset")
 }
 
-func (G *GitCmx) ResetHard() *GitCmx {
+func (G *Gcm) ResetHard() *Gcm {
 	return G.do("git", "reset", "--hard")
 }
 
-func (G *GitCmx) Checkout(nameBranch string) *GitCmx {
+func (G *Gcm) Checkout(nameBranch string) *Gcm {
 	return G.do("git", "checkout", nameBranch)
 }
 
-func (G *GitCmx) CheckoutNewBranch(nameBranch string) *GitCmx {
+func (G *Gcm) CheckoutNewBranch(nameBranch string) *Gcm {
 	return G.do("git", "checkout", "-b", nameBranch)
 }
 
-func (G *GitCmx) Init() *GitCmx {
+func (G *Gcm) Init() *Gcm {
 	return G.do("git", "init")
 }
 
-func (G *GitCmx) Merge(featureBranchName string) *GitCmx {
+func (G *Gcm) Merge(featureBranchName string) *Gcm {
 	return G.do("git", "merge", featureBranchName)
 }
 
-func (G *GitCmx) MergeAbort() *GitCmx {
+func (G *Gcm) MergeAbort() *Gcm {
 	return G.do("git", "merge", "--abort")
 }
 
-func (G *GitCmx) TagList() *GitCmx {
+func (G *Gcm) TagList() *Gcm {
 	return G.do("git", "tag", "--list")
 }
 
-func (G *GitCmx) Tags() *GitCmx {
+func (G *Gcm) Tags() *Gcm {
 	return G.do("git", "tag", "--list")
 }
 
-func (G *GitCmx) Tag(tag string) *GitCmx {
+func (G *Gcm) Tag(tag string) *Gcm {
 	return G.do("git", "tag", tag)
 }
 
-func (G *GitCmx) PushTags() *GitCmx {
+func (G *Gcm) PushTags() *Gcm {
 	return G.do("git", "push", "--tags")
 }
