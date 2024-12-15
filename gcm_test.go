@@ -22,7 +22,7 @@ func TestGcm_Submit(t *testing.T) {
 		Status().
 		Add().
 		WhenExec(func(gcm *gogitxexec.Gcm) (bool, error) {
-			return gcm.CheckStagingChanges()
+			return gcm.HasStagingChanges()
 		}, func(gcm *gogitxexec.Gcm) *gogitxexec.Gcm {
 			return gcm.Commit("提交代码").Push()
 		}).

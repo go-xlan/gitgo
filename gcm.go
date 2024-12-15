@@ -9,8 +9,7 @@ func (G *Gcm) Add() *Gcm {
 }
 
 func (G *Gcm) Commit(m string) *Gcm {
-	//当没有待提交文件时，这里也会报错，目前暂无解决方案。
-	return G.do("git", "commit", "-m", m)
+	return G.do("git", "commit", "-m", m) //当没有待提交文件时，这里也会报错
 }
 
 func (G *Gcm) Pull() *Gcm {
@@ -67,4 +66,8 @@ func (G *Gcm) Tag(tag string) *Gcm {
 
 func (G *Gcm) PushTags() *Gcm {
 	return G.do("git", "push", "--tags")
+}
+
+func (G *Gcm) PushTag(tag string) *Gcm {
+	return G.do("git", "push", "origin", tag)
 }

@@ -16,9 +16,9 @@ func TestGcm_UpdateCmc(t *testing.T) {
 			cmc.WithShellType("bash").WithShellFlag("-c")
 		}).
 		Add().
-		ShowDebug().
+		ShowDebugMessage().
 		MustDone().
 		Status().
-		ShowDebug().
+		ShowDebugMessage().
 		MustDone()
 }

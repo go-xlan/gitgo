@@ -71,7 +71,7 @@ func (G *Gcm) WithDebug() *Gcm {
 	return G
 }
 
-func (G *Gcm) ShowDebug() *Gcm {
+func (G *Gcm) ShowDebugMessage() *Gcm {
 	switch {
 	case G.Erx != nil && len(G.Out) > 0:
 		zaplog.ZAPS.P1.SUG.Errorln("wrong", eroticgo.RED.Sprint(G.Erx), "message:", "\n"+eroticgo.RED.Sprint(string(G.Out))+"\n", "-")
