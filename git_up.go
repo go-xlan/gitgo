@@ -13,7 +13,10 @@ func (G *Gcm) HasStagingChanges() (bool, error) {
 }
 
 func (G *Gcm) CheckStagedChanges() *Gcm {
-	if output, err := G.Cmc.Exec("git", "diff", "--cached", "--quiet"); err == nil && len(output) == 0 {
+	if data, err := G.Cmc.Exec("git", "diff", "--cached", "--quiet"); err == nil {
+		if len(data) != 0 {
+			return newWa(G.Cmc, data, err, G.DBG)
+		}
 		return newWa(G.Cmc, []byte{}, errors.New("no-staged-changes"), G.DBG)
 	}
 	return G

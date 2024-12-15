@@ -54,11 +54,11 @@ func (G *Gcm) do(name string, args ...string) *Gcm {
 	if G.Erx != nil {
 		return G //当出错时就不要再往下执行，直接在这里拦住，这样整个链式的后续动作就都不执行
 	}
-	out, err := G.Cmc.Exec(name, args...)
+	data, err := G.Cmc.Exec(name, args...)
 	if err != nil {
-		return newWa(G.Cmc, out, err, G.DBG)
+		return newWa(G.Cmc, data, err, G.DBG)
 	}
-	return newOK(G.Cmc, out, G.DBG)
+	return newOK(G.Cmc, data, G.DBG)
 }
 
 func (G *Gcm) UpdateCmc(update func(cmc *osexec.CMC)) *Gcm {
