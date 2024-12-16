@@ -12,7 +12,7 @@ func TestGcm_UpdateCmc(t *testing.T) {
 	gcm := gogitxexec.New(runpath.PARENT.Path())
 
 	gcm.WithDebug().
-		UpdateCmc(func(cmc *osexec.CMC) {
+		UpdateCmc(func(cmc *osexec.CommandConfig) {
 			cmc.WithShellType("bash").WithShellFlag("-c")
 		}).
 		Add().

@@ -7,78 +7,82 @@ import (
 )
 
 type Gcm struct {
-	Cmc *osexec.CMC
-	Out []byte
-	Erx error
-	DBG bool
+	cmdConfig *osexec.CommandConfig
+	output    []byte
+	errorOnce error
+	debugMode bool
 }
 
 func New(path string) *Gcm {
-	return newOK(osexec.NewCMC().WithPath(path), make([]byte, 0), false)
+	return newOK(osexec.NewCommandConfig().WithPath(path), make([]byte, 0), false)
 }
 
-func newOK(cmc *osexec.CMC, data []byte, deb bool) *Gcm {
-	if deb {
-		if len(data) > 0 {
-			zaplog.ZAPS.P3.SUG.Debugln("done", "message:", "\n"+eroticgo.GREEN.Sprint(string(data))+"\n", "-")
+func newOK(cmdConfig *osexec.CommandConfig, output []byte, debugMode bool) *Gcm {
+	if debugMode {
+		if len(output) > 0 {
+			zaplog.ZAPS.P3.SUG.Debugln("done", "message:", "\n"+eroticgo.GREEN.Sprint(string(output))+"\n", "-")
 		} else {
 			zaplog.ZAPS.P3.SUG.Debugln("done", "\n", "-")
 		}
 	}
 	return &Gcm{
-		Cmc: cmc,
-		Out: data,
-		Erx: nil,
-		DBG: deb,
+		cmdConfig: cmdConfig,
+		output:    output,
+		errorOnce: nil,
+		debugMode: debugMode,
 	}
 }
 
-func newWa(cmc *osexec.CMC, data []byte, erx error, deb bool) *Gcm {
-	if deb {
-		if len(data) > 0 {
-			zaplog.ZAPS.P3.SUG.Errorln("wrong", eroticgo.RED.Sprint(erx), "message:", "\n"+eroticgo.RED.Sprint(string(data))+"\n", "-")
+func newWa(cmdConfig *osexec.CommandConfig, output []byte, errorOnce error, debugMode bool) *Gcm {
+	if debugMode {
+		if len(output) > 0 {
+			zaplog.ZAPS.P3.SUG.Errorln("wrong", eroticgo.RED.Sprint(errorOnce), "message:", "\n"+eroticgo.RED.Sprint(string(output))+"\n", "-")
 		} else {
-			zaplog.ZAPS.P3.SUG.Errorln("wrong", eroticgo.RED.Sprint(erx))
+			zaplog.ZAPS.P3.SUG.Errorln("wrong", eroticgo.RED.Sprint(errorOnce))
 		}
 	}
 	return &Gcm{
-		Cmc: cmc,
-		Out: data,
-		Erx: erx,
-		DBG: deb,
+		cmdConfig: cmdConfig,
+		output:    output,
+		errorOnce: errorOnce,
+		debugMode: debugMode,
 	}
+}
+
+func (G *Gcm) Result() ([]byte, error) {
+	return G.output, G.errorOnce
 }
 
 // 这个函数不要使用导出的，因为日志里是跳过3层调用栈，假如使用导出的，跳出的栈的层数就不正确啦
 func (G *Gcm) do(name string, args ...string) *Gcm {
-	if G.Erx != nil {
+	if G.errorOnce != nil {
 		return G //当出错时就不要再往下执行，直接在这里拦住，这样整个链式的后续动作就都不执行
 	}
-	data, err := G.Cmc.Exec(name, args...)
+	output, err := G.cmdConfig.Exec(name, args...)
 	if err != nil {
-		return newWa(G.Cmc, data, err, G.DBG)
+		return newWa(G.cmdConfig, output, err, G.debugMode)
 	}
-	return newOK(G.Cmc, data, G.DBG)
+	return newOK(G.cmdConfig, output, G.debugMode)
 }
 
-func (G *Gcm) UpdateCmc(update func(cmc *osexec.CMC)) *Gcm {
-	update(G.Cmc)
+func (G *Gcm) UpdateCmc(updateConfig func(cmc *osexec.CommandConfig)) *Gcm {
+	updateConfig(G.cmdConfig)
 	return G
 }
 
 func (G *Gcm) WithDebug() *Gcm {
-	G.DBG = true
+	G.debugMode = true
 	return G
 }
 
 func (G *Gcm) ShowDebugMessage() *Gcm {
 	switch {
-	case G.Erx != nil && len(G.Out) > 0:
-		zaplog.ZAPS.P1.SUG.Errorln("wrong", eroticgo.RED.Sprint(G.Erx), "message:", "\n"+eroticgo.RED.Sprint(string(G.Out))+"\n", "-")
-	case G.Erx != nil:
-		zaplog.ZAPS.P1.SUG.Errorln("wrong", eroticgo.RED.Sprint(G.Erx), "\n", "-")
-	case len(G.Out) > 0:
-		zaplog.ZAPS.P1.SUG.Debugln("done", "message:", "\n"+eroticgo.GREEN.Sprint(string(G.Out))+"\n", "-")
+	case G.errorOnce != nil && len(G.output) > 0:
+		zaplog.ZAPS.P1.SUG.Errorln("wrong", eroticgo.RED.Sprint(G.errorOnce), "message:", "\n"+eroticgo.RED.Sprint(string(G.output))+"\n", "-")
+	case G.errorOnce != nil:
+		zaplog.ZAPS.P1.SUG.Errorln("wrong", eroticgo.RED.Sprint(G.errorOnce), "\n", "-")
+	case len(G.output) > 0:
+		zaplog.ZAPS.P1.SUG.Debugln("done", "message:", "\n"+eroticgo.GREEN.Sprint(string(G.output))+"\n", "-")
 	default:
 		zaplog.ZAPS.P1.SUG.Debugln("done", "\n", "-")
 	}
@@ -86,11 +90,11 @@ func (G *Gcm) ShowDebugMessage() *Gcm {
 }
 
 func (G *Gcm) MustDone() *Gcm {
-	if G.Erx != nil {
-		if len(G.Out) > 0 {
-			zaplog.ZAPS.P1.SUG.Panicln("wrong", eroticgo.RED.Sprint(G.Erx), "message:", "\n"+eroticgo.RED.Sprint(string(G.Out))+"\n", "-")
+	if G.errorOnce != nil {
+		if len(G.output) > 0 {
+			zaplog.ZAPS.P1.SUG.Panicln("wrong", eroticgo.RED.Sprint(G.errorOnce), "message:", "\n"+eroticgo.RED.Sprint(string(G.output))+"\n", "-")
 		} else {
-			zaplog.ZAPS.P1.SUG.Panicln("wrong", eroticgo.RED.Sprint(G.Erx), "\n", "-")
+			zaplog.ZAPS.P1.SUG.Panicln("wrong", eroticgo.RED.Sprint(G.errorOnce), "\n", "-")
 		}
 	}
 	return G
@@ -104,9 +108,9 @@ func (G *Gcm) When(condition func(*Gcm) bool, run func(*Gcm) *Gcm) *Gcm {
 }
 
 func (G *Gcm) WhenExec(condition func(*Gcm) (bool, error), run func(*Gcm) *Gcm) *Gcm {
-	if ok, err := condition(G); err != nil {
-		return newWa(G.Cmc, nil, err, G.DBG)
-	} else if ok {
+	if success, err := condition(G); err != nil {
+		return newWa(G.cmdConfig, []byte{}, err, G.debugMode)
+	} else if success {
 		return run(G)
 	}
 	return G

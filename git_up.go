@@ -3,9 +3,9 @@ package gogitxexec
 import "github.com/pkg/errors"
 
 func (G *Gcm) HasStagingChanges() (bool, error) {
-	if data, err := G.Cmc.Exec("git", "diff-index", "--cached", "--quiet", "HEAD"); err != nil {
-		if len(data) != 0 {
-			return false, errors.New(string(data))
+	if output, err := G.cmdConfig.Exec("git", "diff-index", "--cached", "--quiet", "HEAD"); err != nil {
+		if len(output) != 0 {
+			return false, errors.New(string(output))
 		}
 		return true, nil
 	}
@@ -13,11 +13,11 @@ func (G *Gcm) HasStagingChanges() (bool, error) {
 }
 
 func (G *Gcm) CheckStagedChanges() *Gcm {
-	if data, err := G.Cmc.Exec("git", "diff", "--cached", "--quiet"); err == nil {
-		if len(data) != 0 {
-			return newWa(G.Cmc, data, err, G.DBG)
+	if output, err := G.cmdConfig.Exec("git", "diff", "--cached", "--quiet"); err == nil {
+		if len(output) != 0 {
+			return newWa(G.cmdConfig, output, err, G.debugMode)
 		}
-		return newWa(G.Cmc, []byte{}, errors.New("no-staged-changes"), G.DBG)
+		return newWa(G.cmdConfig, []byte{}, errors.New("no-staged-changes"), G.debugMode)
 	}
 	return G
 }
