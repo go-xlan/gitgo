@@ -1,14 +1,14 @@
-package gogitxexec_test
+package gogitosgcm_test
 
 import (
 	"testing"
 
-	"github.com/go-xlan/gogitxexec"
+	"github.com/go-xlan/gogitosgcm"
 	"github.com/yyle88/runpath"
 )
 
 func TestGcm_Status(t *testing.T) {
-	gcm := gogitxexec.New(runpath.PARENT.Path())
+	gcm := gogitosgcm.New(runpath.PARENT.Path())
 
 	gcm.WithDebug().
 		Status().
@@ -16,14 +16,14 @@ func TestGcm_Status(t *testing.T) {
 }
 
 func TestGcm_Submit(t *testing.T) {
-	gcm := gogitxexec.New(runpath.PARENT.Path())
+	gcm := gogitosgcm.New(runpath.PARENT.Path())
 
 	gcm.WithDebug().
 		Status().
 		Add().
-		WhenExec(func(gcm *gogitxexec.Gcm) (bool, error) {
+		WhenExec(func(gcm *gogitosgcm.Gcm) (bool, error) {
 			return gcm.HasStagingChanges()
-		}, func(gcm *gogitxexec.Gcm) *gogitxexec.Gcm {
+		}, func(gcm *gogitosgcm.Gcm) *gogitosgcm.Gcm {
 			return gcm.Commit("提交代码").Push()
 		}).
 		MustDone()

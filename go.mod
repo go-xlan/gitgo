@@ -1,4 +1,4 @@
-module github.com/go-xlan/gogitxexec
+module github.com/go-xlan/gogitosgcm
 
 go 1.22.8
 

@@ -1,4 +1,4 @@
-package gogitxexec
+package gogitosgcm
 
 import (
 	"github.com/yyle88/eroticgo"

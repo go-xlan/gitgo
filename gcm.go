@@ -1,4 +1,4 @@
-package gogitxexec
+package gogitosgcm
 
 func (G *Gcm) Status() *Gcm {
 	return G.do("git", "status")
