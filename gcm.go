@@ -1,4 +1,4 @@
-package gogitosgcm
+package gitgo
 
 func (G *Gcm) Status() *Gcm {
 	return G.do("git", "status")

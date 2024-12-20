@@ -1,4 +1,4 @@
-package gogitosgcm
+package gitgo
 
 import (
 	"github.com/yyle88/eroticgo"

@@ -1,4 +1,4 @@
-package gogitosgcm
+package gitgo
 
 import "github.com/pkg/errors"
 
