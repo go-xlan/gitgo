@@ -21,7 +21,7 @@ func TestGcm_Submit(t *testing.T) {
 	gcm.WithDebug().
 		Status().
 		Add().
-		WhenExec(func(gcm *gitgo.Gcm) (bool, error) {
+		WhenThen(func(gcm *gitgo.Gcm) (bool, error) {
 			return gcm.HasStagingChanges()
 		}, func(gcm *gitgo.Gcm) *gitgo.Gcm {
 			return gcm.Commit("提交代码").Push()

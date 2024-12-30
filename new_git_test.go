@@ -8,12 +8,12 @@ import (
 	"github.com/yyle88/runpath"
 )
 
-func TestGcm_UpdateCmc(t *testing.T) {
+func TestGcm_UpdateCommandConfig(t *testing.T) {
 	gcm := gitgo.New(runpath.PARENT.Path())
 
-	gcm.WithDebug().
-		UpdateCmc(func(cmc *osexec.CommandConfig) {
-			cmc.WithShellType("bash").WithShellFlag("-c")
+	gcm.WithDebugMode(true).
+		UpdateCommandConfig(func(cfg *osexec.CommandConfig) {
+			cfg.WithShellType("bash").WithShellFlag("-c")
 		}).
 		Add().
 		ShowDebugMessage().

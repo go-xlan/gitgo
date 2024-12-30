@@ -15,9 +15,9 @@ func (G *Gcm) HasStagingChanges() (bool, error) {
 func (G *Gcm) CheckStagedChanges() *Gcm {
 	if output, err := G.cmdConfig.Exec("git", "diff", "--cached", "--quiet"); err == nil {
 		if len(output) != 0 {
-			return newWa(G.cmdConfig, output, err, G.debugMode)
+			return newWaGcm(G.cmdConfig, output, err, G.debugMode)
 		}
-		return newWa(G.cmdConfig, []byte{}, errors.New("no-staged-changes"), G.debugMode)
+		return newWaGcm(G.cmdConfig, []byte{}, errors.New("no-staged-changes"), G.debugMode)
 	}
 	return G
 }

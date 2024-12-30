@@ -14,10 +14,10 @@ type Gcm struct {
 }
 
 func New(path string) *Gcm {
-	return newOK(osexec.NewCommandConfig().WithPath(path), make([]byte, 0), false)
+	return newOkGcm(osexec.NewCommandConfig().WithPath(path).WithDebugMode(debugModeOpen), make([]byte, 0), debugModeOpen)
 }
 
-func newOK(cmdConfig *osexec.CommandConfig, output []byte, debugMode bool) *Gcm {
+func newOkGcm(cmdConfig *osexec.CommandConfig, output []byte, debugMode bool) *Gcm {
 	if debugMode {
 		if len(output) > 0 {
 			zaplog.ZAPS.P3.SUG.Debugln("done", "message:", "\n"+eroticgo.GREEN.Sprint(string(output))+"\n", "-")
@@ -33,7 +33,7 @@ func newOK(cmdConfig *osexec.CommandConfig, output []byte, debugMode bool) *Gcm 
 	}
 }
 
-func newWa(cmdConfig *osexec.CommandConfig, output []byte, errorOnce error, debugMode bool) *Gcm {
+func newWaGcm(cmdConfig *osexec.CommandConfig, output []byte, errorOnce error, debugMode bool) *Gcm {
 	if debugMode {
 		if len(output) > 0 {
 			zaplog.ZAPS.P3.SUG.Errorln("wrong", eroticgo.RED.Sprint(errorOnce), "message:", "\n"+eroticgo.RED.Sprint(string(output))+"\n", "-")
@@ -60,18 +60,23 @@ func (G *Gcm) do(name string, args ...string) *Gcm {
 	}
 	output, err := G.cmdConfig.Exec(name, args...)
 	if err != nil {
-		return newWa(G.cmdConfig, output, err, G.debugMode)
+		return newWaGcm(G.cmdConfig, output, err, G.debugMode)
 	}
-	return newOK(G.cmdConfig, output, G.debugMode)
+	return newOkGcm(G.cmdConfig, output, G.debugMode)
 }
 
-func (G *Gcm) UpdateCmc(updateConfig func(cmc *osexec.CommandConfig)) *Gcm {
+func (G *Gcm) UpdateCommandConfig(updateConfig func(cfg *osexec.CommandConfig)) *Gcm {
 	updateConfig(G.cmdConfig)
 	return G
 }
 
 func (G *Gcm) WithDebug() *Gcm {
-	G.debugMode = true
+	return G.WithDebugMode(true)
+}
+
+func (G *Gcm) WithDebugMode(debugMode bool) *Gcm {
+	G.debugMode = debugMode
+	G.cmdConfig.WithDebugMode(debugMode)
 	return G
 }
 
@@ -107,9 +112,9 @@ func (G *Gcm) When(condition func(*Gcm) bool, run func(*Gcm) *Gcm) *Gcm {
 	return G
 }
 
-func (G *Gcm) WhenExec(condition func(*Gcm) (bool, error), run func(*Gcm) *Gcm) *Gcm {
+func (G *Gcm) WhenThen(condition func(*Gcm) (bool, error), run func(*Gcm) *Gcm) *Gcm {
 	if success, err := condition(G); err != nil {
-		return newWa(G.cmdConfig, []byte{}, err, G.debugMode)
+		return newWaGcm(G.cmdConfig, []byte{}, err, G.debugMode)
 	} else if success {
 		return run(G)
 	}
