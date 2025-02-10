@@ -20,9 +20,9 @@ func New(path string) *Gcm {
 func newOkGcm(cmdConfig *osexec.CommandConfig, output []byte, debugMode bool) *Gcm {
 	if debugMode {
 		if len(output) > 0 {
-			zaplog.ZAPS.P3.SUG.Debugln("done", "message:", "\n"+eroticgo.GREEN.Sprint(string(output))+"\n", "-")
+			zaplog.ZAPS.Skip3.SUG.Debugln("done", "message:", "\n"+eroticgo.GREEN.Sprint(string(output))+"\n", "-")
 		} else {
-			zaplog.ZAPS.P3.SUG.Debugln("done", "\n", "-")
+			zaplog.ZAPS.Skip3.SUG.Debugln("done", "\n", "-")
 		}
 	}
 	return &Gcm{
@@ -36,9 +36,9 @@ func newOkGcm(cmdConfig *osexec.CommandConfig, output []byte, debugMode bool) *G
 func newWaGcm(cmdConfig *osexec.CommandConfig, output []byte, errorOnce error, debugMode bool) *Gcm {
 	if debugMode {
 		if len(output) > 0 {
-			zaplog.ZAPS.P3.SUG.Errorln("wrong", eroticgo.RED.Sprint(errorOnce), "message:", "\n"+eroticgo.RED.Sprint(string(output))+"\n", "-")
+			zaplog.ZAPS.Skip3.SUG.Errorln("wrong", eroticgo.RED.Sprint(errorOnce), "message:", "\n"+eroticgo.RED.Sprint(string(output))+"\n", "-")
 		} else {
-			zaplog.ZAPS.P3.SUG.Errorln("wrong", eroticgo.RED.Sprint(errorOnce))
+			zaplog.ZAPS.Skip3.SUG.Errorln("wrong", eroticgo.RED.Sprint(errorOnce))
 		}
 	}
 	return &Gcm{
@@ -83,13 +83,13 @@ func (G *Gcm) WithDebugMode(debugMode bool) *Gcm {
 func (G *Gcm) ShowDebugMessage() *Gcm {
 	switch {
 	case G.errorOnce != nil && len(G.output) > 0:
-		zaplog.ZAPS.P1.SUG.Errorln("wrong", eroticgo.RED.Sprint(G.errorOnce), "message:", "\n"+eroticgo.RED.Sprint(string(G.output))+"\n", "-")
+		zaplog.ZAPS.Skip1.SUG.Errorln("wrong", eroticgo.RED.Sprint(G.errorOnce), "message:", "\n"+eroticgo.RED.Sprint(string(G.output))+"\n", "-")
 	case G.errorOnce != nil:
-		zaplog.ZAPS.P1.SUG.Errorln("wrong", eroticgo.RED.Sprint(G.errorOnce), "\n", "-")
+		zaplog.ZAPS.Skip1.SUG.Errorln("wrong", eroticgo.RED.Sprint(G.errorOnce), "\n", "-")
 	case len(G.output) > 0:
-		zaplog.ZAPS.P1.SUG.Debugln("done", "message:", "\n"+eroticgo.GREEN.Sprint(string(G.output))+"\n", "-")
+		zaplog.ZAPS.Skip1.SUG.Debugln("done", "message:", "\n"+eroticgo.GREEN.Sprint(string(G.output))+"\n", "-")
 	default:
-		zaplog.ZAPS.P1.SUG.Debugln("done", "\n", "-")
+		zaplog.ZAPS.Skip1.SUG.Debugln("done", "\n", "-")
 	}
 	return G
 }
@@ -97,9 +97,9 @@ func (G *Gcm) ShowDebugMessage() *Gcm {
 func (G *Gcm) MustDone() *Gcm {
 	if G.errorOnce != nil {
 		if len(G.output) > 0 {
-			zaplog.ZAPS.P1.SUG.Panicln("wrong", eroticgo.RED.Sprint(G.errorOnce), "message:", "\n"+eroticgo.RED.Sprint(string(G.output))+"\n", "-")
+			zaplog.ZAPS.Skip1.SUG.Panicln("wrong", eroticgo.RED.Sprint(G.errorOnce), "message:", "\n"+eroticgo.RED.Sprint(string(G.output))+"\n", "-")
 		} else {
-			zaplog.ZAPS.P1.SUG.Panicln("wrong", eroticgo.RED.Sprint(G.errorOnce), "\n", "-")
+			zaplog.ZAPS.Skip1.SUG.Panicln("wrong", eroticgo.RED.Sprint(G.errorOnce), "\n", "-")
 		}
 	}
 	return G
