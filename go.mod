@@ -6,7 +6,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.10.0
 	github.com/yyle88/eroticgo v0.0.2
-	github.com/yyle88/osexec v0.0.18
+	github.com/yyle88/osexec v0.0.20
 	github.com/yyle88/runpath v1.0.23
 	github.com/yyle88/zaplog v0.0.19
 )

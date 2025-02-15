@@ -7,17 +7,21 @@ import (
 )
 
 type Gcm struct {
-	cmdConfig *osexec.CommandConfig
-	output    []byte
-	errorOnce error
-	debugMode bool
+	execConfig *osexec.ExecConfig
+	output     []byte
+	errorOnce  error
+	debugMode  bool
 }
 
 func New(path string) *Gcm {
 	return newOkGcm(osexec.NewCommandConfig().WithPath(path).WithDebugMode(debugModeOpen), make([]byte, 0), debugModeOpen)
 }
 
-func newOkGcm(cmdConfig *osexec.CommandConfig, output []byte, debugMode bool) *Gcm {
+func NewGcm(path string, execConfig *osexec.ExecConfig) *Gcm {
+	return newOkGcm(execConfig.ShallowClone().WithPath(path).WithDebugMode(debugModeOpen), make([]byte, 0), debugModeOpen)
+}
+
+func newOkGcm(execConfig *osexec.ExecConfig, output []byte, debugMode bool) *Gcm {
 	if debugMode {
 		if len(output) > 0 {
 			zaplog.ZAPS.Skip3.SUG.Debugln("done", "message:", "\n"+eroticgo.GREEN.Sprint(string(output))+"\n", "-")
@@ -26,14 +30,14 @@ func newOkGcm(cmdConfig *osexec.CommandConfig, output []byte, debugMode bool) *G
 		}
 	}
 	return &Gcm{
-		cmdConfig: cmdConfig,
-		output:    output,
-		errorOnce: nil,
-		debugMode: debugMode,
+		execConfig: execConfig,
+		output:     output,
+		errorOnce:  nil,
+		debugMode:  debugMode,
 	}
 }
 
-func newWaGcm(cmdConfig *osexec.CommandConfig, output []byte, errorOnce error, debugMode bool) *Gcm {
+func newWaGcm(execConfig *osexec.ExecConfig, output []byte, errorOnce error, debugMode bool) *Gcm {
 	if debugMode {
 		if len(output) > 0 {
 			zaplog.ZAPS.Skip3.SUG.Errorln("wrong", eroticgo.RED.Sprint(errorOnce), "message:", "\n"+eroticgo.RED.Sprint(string(output))+"\n", "-")
@@ -42,10 +46,10 @@ func newWaGcm(cmdConfig *osexec.CommandConfig, output []byte, errorOnce error, d
 		}
 	}
 	return &Gcm{
-		cmdConfig: cmdConfig,
-		output:    output,
-		errorOnce: errorOnce,
-		debugMode: debugMode,
+		execConfig: execConfig,
+		output:     output,
+		errorOnce:  errorOnce,
+		debugMode:  debugMode,
 	}
 }
 
@@ -58,15 +62,20 @@ func (G *Gcm) do(name string, args ...string) *Gcm {
 	if G.errorOnce != nil {
 		return G //当出错时就不要再往下执行，直接在这里拦住，这样整个链式的后续动作就都不执行
 	}
-	output, err := G.cmdConfig.Exec(name, args...)
+	output, err := G.execConfig.Exec(name, args...)
 	if err != nil {
-		return newWaGcm(G.cmdConfig, output, err, G.debugMode)
+		return newWaGcm(G.execConfig, output, err, G.debugMode)
 	}
-	return newOkGcm(G.cmdConfig, output, G.debugMode)
+	return newOkGcm(G.execConfig, output, G.debugMode)
 }
 
 func (G *Gcm) UpdateCommandConfig(updateConfig func(cfg *osexec.CommandConfig)) *Gcm {
-	updateConfig(G.cmdConfig)
+	updateConfig(G.execConfig)
+	return G
+}
+
+func (G *Gcm) UpdateExecConfig(updateConfig func(cfg *osexec.ExecConfig)) *Gcm {
+	updateConfig(G.execConfig)
 	return G
 }
 
@@ -76,7 +85,7 @@ func (G *Gcm) WithDebug() *Gcm {
 
 func (G *Gcm) WithDebugMode(debugMode bool) *Gcm {
 	G.debugMode = debugMode
-	G.cmdConfig.WithDebugMode(debugMode)
+	G.execConfig.WithDebugMode(debugMode)
 	return G
 }
 
@@ -114,7 +123,7 @@ func (G *Gcm) When(condition func(*Gcm) bool, run func(*Gcm) *Gcm) *Gcm {
 
 func (G *Gcm) WhenThen(condition func(*Gcm) (bool, error), run func(*Gcm) *Gcm) *Gcm {
 	if success, err := condition(G); err != nil {
-		return newWaGcm(G.cmdConfig, []byte{}, err, G.debugMode)
+		return newWaGcm(G.execConfig, []byte{}, err, G.debugMode)
 	} else if success {
 		return run(G)
 	}

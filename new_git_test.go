@@ -22,3 +22,14 @@ func TestGcm_UpdateCommandConfig(t *testing.T) {
 		ShowDebugMessage().
 		MustDone()
 }
+
+func TestNewGcm(t *testing.T) {
+	execConfig := osexec.NewExecConfig()
+
+	gcm := gitgo.NewGcm(runpath.PARENT.Path(), execConfig)
+
+	gcm.WithDebug().
+		Status().
+		ShowDebugMessage().
+		MustDone()
+}
