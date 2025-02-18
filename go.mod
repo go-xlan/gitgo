@@ -5,6 +5,7 @@ go 1.22.8
 require (
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.10.0
+	github.com/yyle88/erero v1.0.18
 	github.com/yyle88/eroticgo v0.0.2
 	github.com/yyle88/osexec v0.0.20
 	github.com/yyle88/runpath v1.0.23
@@ -15,7 +16,6 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/yyle88/done v1.0.21 // indirect
-	github.com/yyle88/erero v1.0.17 // indirect
 	github.com/yyle88/mutexmap v1.0.10 // indirect
 	github.com/yyle88/printgo v1.0.2 // indirect
 	github.com/yyle88/sure v0.0.36 // indirect
