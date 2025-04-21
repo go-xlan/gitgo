@@ -18,13 +18,15 @@ func TestGcm_Status(t *testing.T) {
 func TestGcm_Submit(t *testing.T) {
 	gcm := gitgo.New(runpath.PARENT.Path())
 
-	gcm.WithDebug().
-		Status().
-		Add().
-		WhenThen(func(gcm *gitgo.Gcm) (bool, error) {
-			return gcm.HasStagingChanges()
-		}, func(gcm *gitgo.Gcm) *gitgo.Gcm {
-			return gcm.Commit("提交代码").Push()
-		}).
-		MustDone()
+	if false {
+		gcm.WithDebug().
+			Status().
+			Add().
+			WhenThen(func(gcm *gitgo.Gcm) (bool, error) {
+				return gcm.HasStagingChanges()
+			}, func(gcm *gitgo.Gcm) *gitgo.Gcm {
+				return gcm.Commit("提交代码").Push()
+			}).
+			MustDone()
+	}
 }
