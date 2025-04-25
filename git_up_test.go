@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-xlan/gitgo"
 	"github.com/stretchr/testify/require"
+	"github.com/yyle88/rese"
 	"github.com/yyle88/runpath"
 )
 
@@ -34,6 +35,24 @@ func TestLatestGitTag(t *testing.T) {
 	require.NoError(t, err)
 	t.Log(tag)
 	require.NotEmpty(t, tag)
+}
+
+func TestGcm_LatestGitTagWithPrefixPath(t *testing.T) {
+	gcm := gitgo.New(runpath.PARENT.Path()).WithDebug()
+	tag, err := gcm.LatestGitTagWithPrefixPath("v")
+	require.NoError(t, err)
+	t.Log(tag)
+	require.NotEmpty(t, tag)
+}
+
+func TestGcm_LatestGitTagWithPrefixPath_Compare(t *testing.T) {
+	gcm := gitgo.New(runpath.PARENT.Path()).WithDebug()
+	tagA := rese.C1(gcm.LatestGitTag())
+	t.Log(tagA)
+	tagB := rese.C1(gcm.LatestGitTagWithPrefixPath("v"))
+	t.Log(tagB)
+	//这里只打印，不断言相等，因为确实存在不相等的场景
+	t.Log("tag-A:", tagA, "tag-B:", tagB)
 }
 
 func TestGitCommitHash(t *testing.T) {

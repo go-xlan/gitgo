@@ -8,6 +8,7 @@ require (
 	github.com/yyle88/erero v1.0.20
 	github.com/yyle88/eroticgo v0.0.3
 	github.com/yyle88/osexec v0.0.27
+	github.com/yyle88/rese v0.0.10
 	github.com/yyle88/runpath v1.0.23
 	github.com/yyle88/zaplog v0.0.22
 )
@@ -19,7 +20,6 @@ require (
 	github.com/yyle88/must v0.0.21 // indirect
 	github.com/yyle88/mutexmap v1.0.13 // indirect
 	github.com/yyle88/printgo v1.0.5 // indirect
-	github.com/yyle88/rese v0.0.10 // indirect
 	github.com/yyle88/sure v0.0.38 // indirect
 	github.com/yyle88/syntaxgo v0.0.48 // indirect
 	github.com/yyle88/tern v0.0.7 // indirect
