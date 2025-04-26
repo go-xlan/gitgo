@@ -48,8 +48,8 @@ fi
 	return strings.TrimSpace(string(output)), nil
 }
 
-// LatestGitTagWithPrefixPath 获得指定前缀的子项目或主项目的最新标签名称
-func (G *Gcm) LatestGitTagWithPrefixPath(prefix string) (string, error) {
+// LatestGitTagHasPrefix 获得指定前缀的子项目或主项目的最新标签名称
+func (G *Gcm) LatestGitTagHasPrefix(prefix string) (string, error) {
 	if prefix == "" {
 		return "", erero.New("param prefix is none")
 	}
@@ -61,6 +61,28 @@ echo "$res"
 `
 	// Bash 命令：使用转义后的 prefix 格式化命令，获得完整的命令字符串
 	commandBash := fmt.Sprintf(commandBashTemplate, regexp.QuoteMeta(prefix))
+
+	// 存在问题，就是标签是打在commit提交上面的，因此在相同的提交上打多个标签时，他们的时间是相同的，这时候取到的，有可能不是最新的那个标签
+	output, err := G.execConfig.ShallowClone().WithBash().Exec(strings.TrimSpace(commandBash))
+	if err != nil {
+		return "", erero.Wro(err)
+	}
+	return strings.TrimSpace(string(output)), nil
+}
+
+// LatestGitTagMatchRegexp 获得匹配正则(shell的glob模式正则)的子项目或主项目的最新标签名称
+func (G *Gcm) LatestGitTagMatchRegexp(regexpPattern string) (string, error) {
+	if regexpPattern == "" {
+		return "", erero.New("param regexp_pattern is none")
+	}
+
+	// Bash 命令：获取匹配前缀的最新标签。这里去掉 if [ -z "$res" ] 分支，因为 echo "$res" 在 res 为空时会自动输出空字符串
+	const commandBashTemplate = `
+res=$(git for-each-ref --sort=creatordate --format '%%(refname:short)' refs/tags/%s | tail -n 1)
+echo "$res"
+`
+	// Bash 命令：使用转义后的 prefix 格式化命令，获得完整的命令字符串
+	commandBash := fmt.Sprintf(commandBashTemplate, regexp.QuoteMeta(regexpPattern))
 
 	// 存在问题，就是标签是打在commit提交上面的，因此在相同的提交上打多个标签时，他们的时间是相同的，这时候取到的，有可能不是最新的那个标签
 	output, err := G.execConfig.ShallowClone().WithBash().Exec(strings.TrimSpace(commandBash))
