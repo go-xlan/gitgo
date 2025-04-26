@@ -8,6 +8,7 @@ require (
 	github.com/yyle88/erero v1.0.20
 	github.com/yyle88/eroticgo v0.0.3
 	github.com/yyle88/osexec v0.0.27
+	github.com/yyle88/osexistpath v0.0.17
 	github.com/yyle88/rese v0.0.10
 	github.com/yyle88/runpath v1.0.23
 	github.com/yyle88/zaplog v0.0.22

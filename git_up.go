@@ -88,3 +88,43 @@ func (G *Gcm) SortedGitTags() (string, error) {
 	}
 	return strings.TrimSpace(string(output)), nil
 }
+
+// GetTopPath 获取 git 项目的根目录
+func (G *Gcm) GetTopPath() (string, error) {
+	const commandBash = "git rev-parse --show-toplevel"
+	output, err := G.execConfig.ShallowClone().WithBash().Exec(strings.TrimSpace(commandBash))
+	if err != nil {
+		return "", erero.Wro(err)
+	}
+	return strings.TrimSpace(string(output)), nil
+}
+
+// GetGitDirAbsPath 获取 git 项目的 .git 目录的绝对路径（如 "/home/user/project/.git"）
+func (G *Gcm) GetGitDirAbsPath() (string, error) {
+	const commandBash = "git rev-parse --absolute-git-dir" // 这里不要使用 git rev-parse --git-dir 稍微有点不好用
+	output, err := G.execConfig.ShallowClone().WithBash().Exec(strings.TrimSpace(commandBash))
+	if err != nil {
+		return "", erero.Wro(err)
+	}
+	return strings.TrimSpace(string(output)), nil
+}
+
+// GetSubPathToRoot 获取从当前目录到 git 项目根目录的相对路径（如 "../"，如果在根目录则为空字符串）
+func (G *Gcm) GetSubPathToRoot() (string, error) {
+	const commandBash = "git rev-parse --show-cdup"
+	output, err := G.execConfig.ShallowClone().WithBash().Exec(strings.TrimSpace(commandBash))
+	if err != nil {
+		return "", erero.Wro(err)
+	}
+	return strings.TrimSpace(string(output)), nil
+}
+
+// GetSubPath 获取从 git 项目根目录到当前目录的相对路径（如 "subdir"，如果在根目录则为空字符串）
+func (G *Gcm) GetSubPath() (string, error) {
+	const commandBash = "git rev-parse --show-prefix"
+	output, err := G.execConfig.ShallowClone().WithBash().Exec(strings.TrimSpace(commandBash))
+	if err != nil {
+		return "", erero.Wro(err)
+	}
+	return strings.TrimSpace(string(output)), nil
+}

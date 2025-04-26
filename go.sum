@@ -26,6 +26,8 @@ github.com/yyle88/mutexmap v1.0.13 h1:wp/6mv/gsC2DSqNbhMYiil4gtnb0sDCIhHHIHK2h0c
 github.com/yyle88/mutexmap v1.0.13/go.mod h1:QUYDuARLPlGj414kHewQ5tt8jkDxQXoai8H3C4Gg+yc=
 github.com/yyle88/osexec v0.0.27 h1:idPnc49uXPeU/A1Osn/ZwM3ViP792c5nxZHqTLWuarA=
 github.com/yyle88/osexec v0.0.27/go.mod h1:edWVMCfUjE6SpLrbkngJM+W+HCzUZysRVlWMT/woHQE=
+github.com/yyle88/osexistpath v0.0.17 h1:+F206hMCYMRcGweKoYNRRDgcWolZgKRYzGrDYd9O2n4=
+github.com/yyle88/osexistpath v0.0.17/go.mod h1:+t1m80g/LiZwCiQjalOVuNXVtejsvxqcImj63a/LYhw=
 github.com/yyle88/printgo v1.0.5 h1:gmaJKzEkrH6adbgfOfS6xq02CdvsE8QF+uKXXOdVLN8=
 github.com/yyle88/printgo v1.0.5/go.mod h1:QZZD92Orn8ddmxF5IOEFvLPPW66UIQtgoLixPdpXuQc=
 github.com/yyle88/rese v0.0.10 h1:rMEcybaIe/CNVMmilgor3nMQWB4TcJgXRttvDjKtvLg=
