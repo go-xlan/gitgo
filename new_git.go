@@ -14,11 +14,11 @@ type Gcm struct {
 }
 
 func New(path string) *Gcm {
-	return newOkGcm(osexec.NewCommandConfig().WithPath(path).WithDebugMode(debugModeOpen), make([]byte, 0), debugModeOpen)
+	return newOkGcm(osexec.NewCommandConfig().WithPath(path).WithDebugMode(osexec.NewDebugMode(debugModeOpen)), make([]byte, 0), debugModeOpen)
 }
 
 func NewGcm(path string, execConfig *osexec.ExecConfig) *Gcm {
-	return newOkGcm(execConfig.ShallowClone().WithPath(path).WithDebugMode(debugModeOpen), make([]byte, 0), debugModeOpen)
+	return newOkGcm(execConfig.NewConfig().WithPath(path).WithDebugMode(osexec.NewDebugMode(debugModeOpen)), make([]byte, 0), debugModeOpen)
 }
 
 func newOkGcm(execConfig *osexec.ExecConfig, output []byte, debugMode bool) *Gcm {
@@ -85,7 +85,7 @@ func (G *Gcm) WithDebug() *Gcm {
 
 func (G *Gcm) WithDebugMode(debugMode bool) *Gcm {
 	G.debugMode = debugMode
-	G.execConfig.WithDebugMode(debugMode)
+	G.execConfig.WithDebugMode(osexec.NewDebugMode(debugMode))
 	return G
 }
 

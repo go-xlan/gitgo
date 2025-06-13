@@ -41,7 +41,7 @@ else
   echo "$res"
 fi
 `
-	output, err := G.execConfig.ShallowClone().WithBash().Exec(strings.TrimSpace(commandBash))
+	output, err := G.execConfig.NewConfig().WithBash().Exec(strings.TrimSpace(commandBash))
 	if err != nil {
 		return "", erero.Wro(err)
 	}
@@ -63,7 +63,7 @@ echo "$res"
 	commandBash := fmt.Sprintf(commandBashTemplate, regexp.QuoteMeta(prefix))
 
 	// 存在问题，就是标签是打在commit提交上面的，因此在相同的提交上打多个标签时，他们的时间是相同的，这时候取到的，有可能不是最新的那个标签
-	output, err := G.execConfig.ShallowClone().WithBash().Exec(strings.TrimSpace(commandBash))
+	output, err := G.execConfig.NewConfig().WithBash().Exec(strings.TrimSpace(commandBash))
 	if err != nil {
 		return "", erero.Wro(err)
 	}
@@ -85,7 +85,7 @@ echo "$res"
 	commandBash := fmt.Sprintf(commandBashTemplate, regexp.QuoteMeta(regexpPattern))
 
 	// 存在问题，就是标签是打在commit提交上面的，因此在相同的提交上打多个标签时，他们的时间是相同的，这时候取到的，有可能不是最新的那个标签
-	output, err := G.execConfig.ShallowClone().WithBash().Exec(strings.TrimSpace(commandBash))
+	output, err := G.execConfig.NewConfig().WithBash().Exec(strings.TrimSpace(commandBash))
 	if err != nil {
 		return "", erero.Wro(err)
 	}
@@ -104,7 +104,7 @@ func (G *Gcm) GitCommitHash(refName string) (string, error) {
 // SortedGitTags 获取项目的标签列表，按时间从前到后排列。使用场景是仅仅观察标签，让用户自己想出下一个标签的序号，因此这里只返回个字符串就行
 func (G *Gcm) SortedGitTags() (string, error) {
 	const commandBash = "git for-each-ref --sort=creatordate --format '%(refname) %(creatordate)' refs/tags"
-	output, err := G.execConfig.ShallowClone().WithBash().Exec(strings.TrimSpace(commandBash))
+	output, err := G.execConfig.NewConfig().WithBash().Exec(strings.TrimSpace(commandBash))
 	if err != nil {
 		return "", erero.Wro(err)
 	}
@@ -114,7 +114,7 @@ func (G *Gcm) SortedGitTags() (string, error) {
 // GetTopPath 获取 git 项目的根目录
 func (G *Gcm) GetTopPath() (string, error) {
 	const commandBash = "git rev-parse --show-toplevel"
-	output, err := G.execConfig.ShallowClone().WithBash().Exec(strings.TrimSpace(commandBash))
+	output, err := G.execConfig.NewConfig().WithBash().Exec(strings.TrimSpace(commandBash))
 	if err != nil {
 		return "", erero.Wro(err)
 	}
@@ -124,7 +124,7 @@ func (G *Gcm) GetTopPath() (string, error) {
 // GetGitDirAbsPath 获取 git 项目的 .git 目录的绝对路径（如 "/home/user/project/.git"）
 func (G *Gcm) GetGitDirAbsPath() (string, error) {
 	const commandBash = "git rev-parse --absolute-git-dir" // 这里不要使用 git rev-parse --git-dir 稍微有点不好用
-	output, err := G.execConfig.ShallowClone().WithBash().Exec(strings.TrimSpace(commandBash))
+	output, err := G.execConfig.NewConfig().WithBash().Exec(strings.TrimSpace(commandBash))
 	if err != nil {
 		return "", erero.Wro(err)
 	}
@@ -134,7 +134,7 @@ func (G *Gcm) GetGitDirAbsPath() (string, error) {
 // GetSubPathToRoot 获取从当前目录到 git 项目根目录的相对路径（如 "../"，如果在根目录则为空字符串）
 func (G *Gcm) GetSubPathToRoot() (string, error) {
 	const commandBash = "git rev-parse --show-cdup"
-	output, err := G.execConfig.ShallowClone().WithBash().Exec(strings.TrimSpace(commandBash))
+	output, err := G.execConfig.NewConfig().WithBash().Exec(strings.TrimSpace(commandBash))
 	if err != nil {
 		return "", erero.Wro(err)
 	}
@@ -144,7 +144,7 @@ func (G *Gcm) GetSubPathToRoot() (string, error) {
 // GetSubPath 获取从 git 项目根目录到当前目录的相对路径（如 "subdir"，如果在根目录则为空字符串）
 func (G *Gcm) GetSubPath() (string, error) {
 	const commandBash = "git rev-parse --show-prefix"
-	output, err := G.execConfig.ShallowClone().WithBash().Exec(strings.TrimSpace(commandBash))
+	output, err := G.execConfig.NewConfig().WithBash().Exec(strings.TrimSpace(commandBash))
 	if err != nil {
 		return "", erero.Wro(err)
 	}
