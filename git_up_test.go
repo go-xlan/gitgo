@@ -19,6 +19,30 @@ func TestGcm_HasStagingChanges(t *testing.T) {
 	t.Log(changes)
 }
 
+func TestGcm_HasUnstagedChanges(t *testing.T) {
+	gcm := gitgo.New(runpath.PARENT.Path())
+
+	changes, err := gcm.HasUnstagedChanges()
+	require.NoError(t, err)
+	t.Log(changes)
+}
+
+func TestGcm_HasChanges(t *testing.T) {
+	gcm := gitgo.New(runpath.PARENT.Path())
+
+	changes, err := gcm.HasChanges()
+	require.NoError(t, err)
+	t.Log(changes)
+}
+
+func TestGcm_GetPorcelainStatus(t *testing.T) {
+	gcm := gitgo.New(runpath.PARENT.Path())
+
+	status, err := gcm.GetPorcelainStatus()
+	require.NoError(t, err)
+	t.Log(status)
+}
+
 func TestGcm_CheckStagedChanges(t *testing.T) {
 	gcm := gitgo.New(runpath.PARENT.Path())
 
@@ -106,9 +130,9 @@ func TestGcm_GetTopPath(t *testing.T) {
 	osmustexist.MustRoot(filepath.Join(root, ".git"))
 }
 
-func TestGcm_GetGitDirAbsPath(t *testing.T) {
+func TestGcm_GetGitDIRAbsPath(t *testing.T) {
 	gcm := gitgo.New(runpath.PARENT.Path()).WithDebug()
-	path, err := gcm.GetGitDirAbsPath()
+	path, err := gcm.GetGitDIRAbsPath()
 	require.NoError(t, err)
 	t.Log(path)
 	require.NotEmpty(t, path)
@@ -135,4 +159,60 @@ func TestGcm_GetSubPath(t *testing.T) {
 	require.Empty(t, path)
 	t.Log("sub path is the project root")
 	osmustexist.MustRoot(runpath.PARENT.Join(".git"))
+}
+
+func TestGcm_IsInsideWorkTree(t *testing.T) {
+	gcm := gitgo.New(runpath.PARENT.Path()).WithDebug()
+	inside, err := gcm.IsInsideWorkTree()
+	require.NoError(t, err)
+	t.Log(inside)
+	require.True(t, inside)
+}
+
+func TestGcm_GetCurrentBranch(t *testing.T) {
+	gcm := gitgo.New(runpath.PARENT.Path()).WithDebug()
+	branch, err := gcm.GetCurrentBranch()
+	require.NoError(t, err)
+	t.Log(branch)
+	require.NotEmpty(t, branch)
+}
+
+func TestGcm_GetRemoteURL(t *testing.T) {
+	gcm := gitgo.New(runpath.PARENT.Path()).WithDebug()
+	remoteURL, err := gcm.GetRemoteURL("origin")
+	require.NoError(t, err)
+	t.Log(remoteURL)
+	require.NotEmpty(t, remoteURL)
+}
+
+func TestGcm_GetCommitCount(t *testing.T) {
+	gcm := gitgo.New(runpath.PARENT.Path()).WithDebug()
+	count, err := gcm.GetCommitCount()
+	require.NoError(t, err)
+	t.Log(count)
+	require.Greater(t, count, 0)
+}
+
+func TestGcm_ListBranches(t *testing.T) {
+	gcm := gitgo.New(runpath.PARENT.Path()).WithDebug()
+	branches, err := gcm.ListBranches()
+	require.NoError(t, err)
+	t.Log(branches)
+	require.NotEmpty(t, branches)
+}
+
+func TestGcm_ListRemoteBranches(t *testing.T) {
+	gcm := gitgo.New(runpath.PARENT.Path()).WithDebug()
+	branches, err := gcm.ListRemoteBranches()
+	require.NoError(t, err)
+	t.Log(branches)
+	require.NotEmpty(t, branches)
+}
+
+func TestGcm_GetLogOneLine(t *testing.T) {
+	gcm := gitgo.New(runpath.PARENT.Path()).WithDebug()
+	commits, err := gcm.GetLogOneLine(5)
+	require.NoError(t, err)
+	t.Log(commits)
+	require.NotEmpty(t, commits)
 }
