@@ -1,7 +1,7 @@
 [![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/go-xlan/gitgo/release.yml?branch=main&label=BUILD)](https://github.com/go-xlan/gitgo/actions/workflows/release.yml?query=branch%3Amain)
 [![GoDoc](https://pkg.go.dev/badge/github.com/go-xlan/gitgo)](https://pkg.go.dev/github.com/go-xlan/gitgo)
 [![Coverage Status](https://img.shields.io/coveralls/github/go-xlan/gitgo/main.svg)](https://coveralls.io/github/go-xlan/gitgo?branch=main)
-[![Supported Go Versions](https://img.shields.io/badge/Go-1.22--1.25-lightgrey.svg)](https://go.dev/)
+[![Supported Go Versions](https://img.shields.io/badge/Go-1.22--1.25-lightgrey.svg)](https://github.com/go-xlan/gitgo)
 [![GitHub Release](https://img.shields.io/github/release/go-xlan/gitgo.svg)](https://github.com/go-xlan/gitgo/releases)
 [![Go Report Card](https://goreportcard.com/badge/github.com/go-xlan/gitgo)](https://goreportcard.com/report/github.com/go-xlan/gitgo)
 
@@ -19,11 +19,16 @@ Streamlined Git command execution engine with fluent chaining interface and comp
 
 ## Main Features
 
-🔗 **Fluent Chaining Interface**: Method chaining for complex Git workflows with automatic error propagation
-⚡ **Comprehensive Git Operations**: Full coverage of Git commands including commit, push, pull, and branch management
-🔍 **Smart State Detection**: Intelligent checking for staged/unstaged changes, clean working trees, and repository status
-🎯 **Error Handling**: Robust error propagation with detailed context and debug information
-📋 **Repository Querying**: Advanced repository introspection with branch, commit, and status information
+🔗 **Fluent Chaining Interface**: Method chaining with complex Git workflows and automatic issue propagation
+⚡ **Comprehensive Git Operations**: Complete Git commands coverage including commit, push, fetch, and branch management
+🔍 **Smart State Detection**: Intelligent checking on staged and unstaged changes, clean working trees, and repo status
+🎯 **Issue Handling**: Robust issue propagation with detailed context and debug information
+📋 **Repo Querying**: Advanced repo introspection with branch, commit, and status information
+
+## Related Projects
+
+- **[gogit](https://github.com/go-xlan/gogit)** - Enhanced Git operations toolkit with go-git foundation, providing pure Go implementation without CLI dependencies
+- **[gitgo](https://github.com/go-xlan/gitgo)** (this project) - Streamlined Git command execution engine with fluent chaining interface
 
 ## Installation
 
@@ -70,7 +75,7 @@ func main() {
 
 ⬆️ **Source:** [Source](internal/demos/demo1x/main.go)
 
-### Repository State Detection
+### Repo State Detection
 
 ```go
 package main
@@ -116,7 +121,7 @@ func main() {
 
 ⬆️ **Source:** [Source](internal/demos/demo2x/main.go)
 
-### Tags and Repository Information
+### Tags and Repo Information
 
 ```go
 package main
@@ -161,42 +166,41 @@ func main() {
 
 ⬆️ **Source:** [Source](internal/demos/demo3x/main.go)
 
-
 ## API Reference
 
 ### Core Methods
 
-- `New(path string) *Gcm` - Create new Git command manager
-- `NewGcm(path, execConfig) *Gcm` - Create with custom configuration
+- `New(path string) *Gcm` - Create new Git command engine
+- `NewGcm(path, execConfig) *Gcm` - Create with custom settings
 
 ### Git Operations
 
-- `Status() *Gcm` - Display working tree status
-- `Add() *Gcm` - Stage all changes
+- `Status() *Gcm` - Show working tree status
+- `Add() *Gcm` - Stage changes
 - `Commit(message) *Gcm` - Create commit with message
-- `Push() *Gcm` - Push to remote repository
-- `Pull() *Gcm` - Pull from remote repository
+- `Push() *Gcm` - Push to remote repo
+- `Pull() *Gcm` - Fetch and merge from remote repo
 
 ### Branch Management
 
 - `CheckoutNewBranch(name) *Gcm` - Create and switch to new branch
 - `Checkout(name) *Gcm` - Switch to existing branch
-- `GetCurrentBranch() (string, error)` - Get current branch name
-- `ListBranches() ([]string, error)` - List all branches
+- `GetCurrentBranch() (string, error)` - Get the branch name
+- `ListBranches() ([]string, error)` - Get branches as a list
 
-### Repository State
+### Repo State
 
-- `HasStagingChanges() (bool, error)` - Check for staged changes
-- `HasUnstagedChanges() (bool, error)` - Check for unstaged changes
-- `HasChanges() (bool, error)` - Check for any changes
-- `GetCommitCount() (int, error)` - Get total commit count
-- `GitCommitHash(ref) (string, error)` - Get commit hash for reference
-- `GetRemoteURL(remote) (string, error)` - Get remote repository URL
+- `HasStagingChanges() (bool, error)` - Check staged changes existence
+- `HasUnstagedChanges() (bool, error)` - Check unstaged changes existence
+- `HasChanges() (bool, error)` - Check changes existence
+- `GetCommitCount() (int, error)` - Get commit count
+- `GitCommitHash(ref) (string, error)` - Get commit hash with reference
+- `GetRemoteURL(remote) (string, error)` - Get remote repo URL
 
-### Error Handling
+### Issue Handling
 
-- `Result() ([]byte, error)` - Get output and check for errors
-- `MustDone() *Gcm` - Panic if error occurred
+- `Result() ([]byte, error)` - Get output and check issues
+- `MustDone() *Gcm` - Panic when issues happen
 
 <!-- TEMPLATE (EN) BEGIN: STANDARD PROJECT FOOTER -->
 <!-- VERSION 2025-09-06 04:53:24.895249 +0000 UTC -->
@@ -212,44 +216,44 @@ MIT License. See [LICENSE](LICENSE).
 Contributions are welcome! Report bugs, suggest features, and contribute code:
 
 - 🐛 **Found a bug?** Open an issue on GitHub with reproduction steps
-- 💡 **Have a feature idea?** Create an issue to discuss the suggestion
-- 📖 **Documentation confusing?** Report it so we can improve
-- 🚀 **Need new features?** Share the use cases to help us understand requirements
+- 💡 **Have a feature idea?** Create an issue to discuss the concept
+- 📖 **Documentation confusing?** Report it and we can enhance
+- 🚀 **Need new features?** Share the use cases to help us understand needs
 - ⚡ **Performance issue?** Help us optimize through reporting slow operations
 - 🔧 **Configuration problem?** Ask questions about complex setups
 - 📢 **Follow project progress?** Watch the repo to get new releases and features
-- 🌟 **Success stories?** Share how this package improved the workflow
-- 💬 **Feedback?** We welcome suggestions and comments
+- 🌟 **Success stories?** Share how this package helped the workflow
+- 💬 **Feedback?** We welcome input and comments
 
 ---
 
 ## 🔧 Development
 
-New code contributions, follow this process:
+When contributing new code, follow this process:
 
-1. **Fork**: Fork the repo on GitHub (using the webpage UI).
-2. **Clone**: Clone the forked project (`git clone https://github.com/yourname/repo-name.git`).
+1. **Fork**: Fork the repo on GitHub (using the webpage UI)
+2. **Clone**: Clone the forked project (`git clone https://github.com/yourname/repo-name.git`)
 3. **Navigate**: Navigate to the cloned project (`cd repo-name`)
-4. **Branch**: Create a feature branch (`git checkout -b feature/xxx`).
+4. **Branch**: Create a feature branch (`git checkout -b feature/xxx`)
 5. **Code**: Implement the changes with comprehensive tests
-6. **Testing**: (Golang project) Ensure tests pass (`go test ./...`) and follow Go code style conventions
-7. **Documentation**: Update documentation to support client-facing changes and use significant commit messages
+6. **Testing**: (Golang project) Make sure tests pass (`go test ./...`) and follow Go code conventions
+7. **Documentation**: Update documentation to support changes and write commit messages with substance
 8. **Stage**: Stage changes (`git add .`)
-9. **Commit**: Commit changes (`git commit -m "Add feature xxx"`) ensuring backward compatible code
-10. **Push**: Push to the branch (`git push origin feature/xxx`).
-11. **PR**: Open a pull request on GitHub (on the GitHub webpage) with detailed description.
+9. **Commit**: Commit changes (`git commit -m "Add feature xxx"`) with backward compatible code
+10. **Push**: Push to the branch (`git push origin feature/xxx`)
+11. **PR**: Open a PR on GitHub (on the GitHub webpage) with detailed description
 
-Please ensure tests pass and include relevant documentation updates.
+Make sure tests pass and include documentation updates as needed.
 
 ---
 
 ## 🌟 Support
 
-Welcome to contribute to this project via submitting merge requests and reporting issues.
+Welcome to contribute to this project through submitting PRs and reporting issues.
 
 **Project Support:**
 
-- ⭐ **Give GitHub stars** if this project helps you
+- ⭐ **Give GitHub stars** when this project helps you
 - 🤝 **Share with teammates** and (golang) programming friends
 - 📝 **Write tech blogs** about development tools and workflows - we provide content writing support
 - 🌟 **Join the ecosystem** - committed to supporting open source and the (golang) development scene

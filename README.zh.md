@@ -1,7 +1,7 @@
 [![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/go-xlan/gitgo/release.yml?branch=main&label=BUILD)](https://github.com/go-xlan/gitgo/actions/workflows/release.yml?query=branch%3Amain)
 [![GoDoc](https://pkg.go.dev/badge/github.com/go-xlan/gitgo)](https://pkg.go.dev/github.com/go-xlan/gitgo)
 [![Coverage Status](https://img.shields.io/coveralls/github/go-xlan/gitgo/main.svg)](https://coveralls.io/github/go-xlan/gitgo?branch=main)
-[![Supported Go Versions](https://img.shields.io/badge/Go-1.22--1.25-lightgrey.svg)](https://go.dev/)
+[![Supported Go Versions](https://img.shields.io/badge/Go-1.22--1.25-lightgrey.svg)](https://github.com/go-xlan/gitgo)
 [![GitHub Release](https://img.shields.io/github/release/go-xlan/gitgo.svg)](https://github.com/go-xlan/gitgo/releases)
 [![Go Report Card](https://goreportcard.com/badge/github.com/go-xlan/gitgo)](https://goreportcard.com/report/github.com/go-xlan/gitgo)
 
@@ -19,11 +19,16 @@
 
 ## 核心特性
 
-🔗 **流式链式接口**: 复杂 Git 工作流的方法链式调用，具有自动错误传播
+🔗 **流式链式接口**: 复杂 Git 工作流的方法链式调用，具有自动问题传播
 ⚡ **全面 Git 操作**: 完整覆盖 Git 命令，包括提交、推送、拉取和分支管理
-🔍 **智能状态检测**: 智能检查暂存/未暂存更改、干净工作树和仓库状态
-🎯 **错误处理**: 强大的错误传播，具有详细上下文和调试信息
+🔍 **智能状态检测**: 智能检查暂存和未暂存更改、干净工作树和仓库状态
+🎯 **问题处理**: 强健的问题传播，具有详细上下文和调试信息
 📋 **仓库查询**: 高级仓库信息查询，包括分支、提交和状态信息
+
+## 关联项目
+
+- **[gogit](https://github.com/go-xlan/gogit)** - 增强型 Git 操作工具包，基于 go-git 实现，提供纯 Go 实现无需 CLI 依赖
+- **[gitgo](https://github.com/go-xlan/gitgo)**（本项目）- 流式 Git 命令执行引擎，具有流畅的链式调用接口
 
 ## 安装
 
@@ -165,37 +170,37 @@ func main() {
 
 ### 核心方法
 
-- `New(path string) *Gcm` - 创建新的 Git 命令管理器
-- `NewGcm(path, execConfig) *Gcm` - 使用自定义配置创建
+- `New(path string) *Gcm` - 创建新的 Git 命令引擎
+- `NewGcm(path, execConfig) *Gcm` - 使用自定义设置创建
 
 ### Git 操作
 
 - `Status() *Gcm` - 显示工作树状态
-- `Add() *Gcm` - 暂存所有更改
+- `Add() *Gcm` - 暂存更改
 - `Commit(message) *Gcm` - 创建带消息的提交
 - `Push() *Gcm` - 推送到远程仓库
-- `Pull() *Gcm` - 从远程仓库拉取
+- `Pull() *Gcm` - 从远程仓库获取并合并
 
 ### 分支管理
 
 - `CheckoutNewBranch(name) *Gcm` - 创建并切换到新分支
 - `Checkout(name) *Gcm` - 切换到现有分支
-- `GetCurrentBranch() (string, error)` - 获取当前分支名称
-- `ListBranches() ([]string, error)` - 列出所有分支
+- `GetCurrentBranch() (string, error)` - 获取分支名称
+- `ListBranches() ([]string, error)` - 获取分支列表
 
 ### 仓库状态
 
-- `HasStagingChanges() (bool, error)` - 检查暂存更改
-- `HasUnstagedChanges() (bool, error)` - 检查未暂存更改
-- `HasChanges() (bool, error)` - 检查任何更改
-- `GetCommitCount() (int, error)` - 获取总提交数量
-- `GitCommitHash(ref) (string, error)` - 获取引用的提交哈希
+- `HasStagingChanges() (bool, error)` - 检查暂存更改是否存在
+- `HasUnstagedChanges() (bool, error)` - 检查未暂存更改是否存在
+- `HasChanges() (bool, error)` - 检查更改是否存在
+- `GetCommitCount() (int, error)` - 获取提交数量
+- `GitCommitHash(ref) (string, error)` - 使用引用获取提交哈希
 - `GetRemoteURL(remote) (string, error)` - 获取远程仓库 URL
 
-### 错误处理
+### 问题处理
 
-- `Result() ([]byte, error)` - 获取输出并检查错误
-- `MustDone() *Gcm` - 如果发生错误则触发 panic
+- `Result() ([]byte, error)` - 获取输出并检查问题
+- `MustDone() *Gcm` - 当问题发生时触发 panic
 
 <!-- TEMPLATE (ZH) BEGIN: STANDARD PROJECT FOOTER -->
 <!-- VERSION 2025-09-06 04:53:24.895249 +0000 UTC -->
@@ -232,7 +237,7 @@ MIT 许可证。详见 [LICENSE](LICENSE)。
 4. **分支**：创建功能分支（`git checkout -b feature/xxx`）
 5. **编码**：实现您的更改并编写全面的测试
 6. **测试**：（Golang 项目）确保测试通过（`go test ./...`）并遵循 Go 代码风格约定
-7. **文档**：为面向用户的更改更新文档，并使用有意义的提交消息
+7. **文档**：为面向用户的更改更新文档，并编写有内容的提交消息
 8. **暂存**：暂存更改（`git add .`）
 9. **提交**：提交更改（`git commit -m "Add feature xxx"`）确保向后兼容的代码
 10. **推送**：推送到分支（`git push origin feature/xxx`）
