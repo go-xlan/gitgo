@@ -2,6 +2,7 @@ package gitgo
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -17,22 +18,18 @@ import (
 // 在找到暂存更改时返回 true，否则返回 false
 // 使用场景：避免在没有暂存更改时执行 commit 操作，防止问题和产生空提交
 func (G *Gcm) HasStagingChanges() (bool, error) {
-	const (
-		nonChanges = "non-changes"
-		hasChanges = "has-changes"
-	)
-
-	output, err := G.execConfig.NewConfig().WithBash().
-		Exec(`git diff-index --cached --quiet HEAD
-case $? in
-    0) echo "` + nonChanges + `" ;;
-    1) echo "` + hasChanges + `" ;;
-    *) exit $? ;;
-esac`)
+	_, exc, err := G.execConfig.NewConfig().WithExpectExit(1, "HAS-CHANGES").ExecTake("git", "diff-index", "--cached", "--quiet", "HEAD")
 	if err != nil {
 		return false, erero.Wro(err)
 	}
-	return strings.TrimSpace(string(output)) == hasChanges, nil
+	switch exc {
+	case 1:
+		return true, nil // Has staged changes // 有暂存更改
+	case 0:
+		return false, nil // No staged changes // 无暂存更改
+	default:
+		return false, erero.Errorf("git diff-index failed with exit code %d", exc)
+	}
 }
 
 // HasUnstagedChanges checks if working tree has unstaged modifications
@@ -43,22 +40,18 @@ esac`)
 // 在检测到未暂存更改时返回 true，如果工作树与暂存区匹配则返回 false
 // 使用场景：在提交操作时检查暂存需求
 func (G *Gcm) HasUnstagedChanges() (bool, error) {
-	const (
-		nonChanges = "non-changes"
-		hasChanges = "has-changes"
-	)
-
-	output, err := G.execConfig.NewConfig().WithBash().
-		Exec(`git diff --quiet
-case $? in
-    0) echo "` + nonChanges + `" ;;
-    1) echo "` + hasChanges + `" ;;
-    *) exit $? ;;
-esac`)
+	_, exc, err := G.execConfig.NewConfig().WithExpectExit(1, "HAS-CHANGES").ExecTake("git", "diff", "--quiet")
 	if err != nil {
 		return false, erero.Wro(err)
 	}
-	return strings.TrimSpace(string(output)) == hasChanges, nil
+	switch exc {
+	case 1:
+		return true, nil // Has unstaged changes // 有未暂存更改
+	case 0:
+		return false, nil // No unstaged changes // 无未暂存更改
+	default:
+		return false, erero.Errorf("git diff failed with exit code %d", exc)
+	}
 }
 
 // HasChanges checks if changes exist (staged and unstaged)
@@ -69,27 +62,23 @@ esac`)
 // 在检测到任何修改时返回 true，如果仓库干净则返回 false
 // 使用场景：在上下文切换时快速检查进行中的工作
 func (G *Gcm) HasChanges() (bool, error) {
-	const (
-		nonChanges = "non-changes"
-		hasChanges = "has-changes"
-	)
-
-	output, err := G.execConfig.NewConfig().WithBash().
-		Exec(`git diff-index --quiet HEAD
-case $? in
-    0) echo "` + nonChanges + `" ;;
-    1) echo "` + hasChanges + `" ;;
-    *) exit $? ;;
-esac`)
+	_, exc, err := G.execConfig.NewConfig().WithExpectExit(1, "HAS-CHANGES").ExecTake("git", "diff-index", "--quiet", "HEAD")
 	if err != nil {
 		return false, erero.Wro(err)
 	}
-	return strings.TrimSpace(string(output)) == hasChanges, nil
+	switch exc {
+	case 1:
+		return true, nil // Has changes // 有更改
+	case 0:
+		return false, nil // No changes // 无更改
+	default:
+		return false, erero.Errorf("git diff-index failed with exit code %d", exc)
+	}
 }
 
 // GetPorcelainStatus checks if uncommitted changes exist in repo
 // Returns clean status if repo has no staged and unstaged changes
-// Use case: check clean state during key operations like branch switching and releases
+// Use case: check clean state in important operations like branch switching and releases
 //
 // GetPorcelainStatus 检查仓库中是否存在未提交的更改
 // 如果仓库没有已暂存和未暂存更改则返回干净状态
@@ -110,30 +99,17 @@ func (G *Gcm) GetPorcelainStatus() (string, error) {
 // 在没有找到暂存更改时返回带有问题状态的 Gcm 实例
 // 使用场景：如果工作路径干净则防止 commit 操作
 func (G *Gcm) CheckStagedChanges() *Gcm {
-	const (
-		nonStagedChanges = "non-staged-changes"
-		hasStagedChanges = "has-staged-changes"
-	)
-
-	output, err := G.execConfig.NewConfig().WithBash().
-		Exec(`git diff-index --cached --quiet HEAD
-case $? in
-    0) echo "` + nonStagedChanges + `"; exit 0 ;;
-    1) echo "` + hasStagedChanges + `"; exit 0 ;;
-    *) exit $? ;;
-esac`)
+	_, exc, err := G.execConfig.NewConfig().WithExpectExit(1, "HAS-STAGED-CHANGES").ExecTake("git", "diff-index", "--cached", "--quiet", "HEAD")
 	if err != nil {
-		return newWaGcm(G.execConfig, output, err, G.debugMode)
+		return newWaGcm(G.execConfig, []byte{}, err, G.debugMode)
 	}
-	// Check staged changes based on output content // 根据输出内容判断是否有暂存更改
-	state := strings.TrimSpace(string(output))
-	switch state {
-	case hasStagedChanges:
-		return G
-	case nonStagedChanges:
-		return newWaGcm(G.execConfig, []byte{}, errors.New(nonStagedChanges), G.debugMode)
+	switch exc {
+	case 1:
+		return G // Has staged changes // 有暂存的更改
+	case 0:
+		return newWaGcm(G.execConfig, []byte{}, errors.New("NON-STAGED-CHANGES"), G.debugMode)
 	default:
-		return newWaGcm(G.execConfig, output, errors.Errorf("UNEXPECTED OUTPUT: %s", state), G.debugMode)
+		return newWaGcm(G.execConfig, []byte{}, errors.Errorf("git diff-index failed with exit code %d", exc), G.debugMode)
 	}
 }
 
@@ -147,7 +123,7 @@ esac`)
 func (G *Gcm) LatestGitTag() (string, error) {
 	output, err := G.execConfig.Exec("git", "describe", "--tags", "--abbrev=0")
 	if err != nil {
-		return "", erero.Wro(err) // Wrap and return error // 包装并返回错误
+		return "", erero.Wro(err) // Wrap and return failure // 包装并返回错误
 	}
 	return strings.TrimSpace(string(output)), nil
 }
@@ -163,12 +139,12 @@ func (G *Gcm) LatestGitTagHasPrefix(prefix string) (string, error) {
 	if prefix == "" {
 		return "", erero.New("prefix is required")
 	}
-	// Validate prefix security to prevent command injection // 验证prefix安全性，避免命令注入
+	// Validate prefix to prevent command injection // 验证prefix安全性，避免命令注入
 	if strings.Contains(prefix, "'") || strings.Contains(prefix, "`") || strings.Contains(prefix, "$") {
 		return "", erero.New("prefix contains unsafe characters")
 	}
 
-	// Use git tag -l to list tags matching prefix, sorted by version desc, take first // 使用 git tag -l 列出匹配前缀的标签，按版本号降序排序，取第一个
+	// Use git tag -l to list tags matching prefix, version desc sort, take first // 使用 git tag -l 列出匹配前缀的标签，按版本号降序排序，取第一个
 	output, err := G.execConfig.NewConfig().WithBash().Exec(fmt.Sprintf("git tag -l --sort=-version:refname '%s*' | head -n 1", prefix))
 	if err != nil {
 		return "", erero.Wro(err)
@@ -177,9 +153,9 @@ func (G *Gcm) LatestGitTagHasPrefix(prefix string) (string, error) {
 	return strings.TrimSpace(string(output)), nil
 }
 
-// LatestGitTagMatchRegexp retrieves the latest tag matching shell glob pattern
-// Returns most recent tag that matches the given glob pattern and empty string
-// Supports wildcard patterns during subproject and component versioning
+// LatestGitTagMatchRegexp retrieves the latest tag matching glob pattern
+// Returns most recent tag that matches the given glob pattern, blank if none
+// Supports wildcards in subproject and component versioning
 //
 // LatestGitTagMatchRegexp 获取匹配 shell glob 模式的最新标签
 // 返回匹配给定 glob 模式的最新标签和空字符串
@@ -188,12 +164,12 @@ func (G *Gcm) LatestGitTagMatchRegexp(regexpPattern string) (string, error) {
 	if regexpPattern == "" {
 		return "", erero.New("regexpPattern is required")
 	}
-	// Validate pattern security to prevent command injection // 验证regexpPattern安全性，避免命令注入
+	// Validate pattern to prevent command injection // 验证regexpPattern安全性，避免命令注入
 	if strings.Contains(regexpPattern, "'") || strings.Contains(regexpPattern, "`") || strings.Contains(regexpPattern, "$") {
 		return "", erero.New("regexpPattern contains unsafe characters")
 	}
 
-	// Use git tag -l with glob pattern, sorted by version desc, take first // 使用 git tag -l 匹配 glob 模式，按版本号降序排序，取第一个
+	// Use git tag -l with glob pattern, version desc sort, take first // 使用 git tag -l 匹配 glob 模式，按版本号降序排序，取第一个
 	output, err := G.execConfig.NewConfig().WithBash().Exec(fmt.Sprintf("git tag -l --sort=-version:refname '%s' | head -n 1", regexpPattern))
 	if err != nil {
 		return "", erero.Wro(err)
@@ -220,7 +196,7 @@ func (G *Gcm) GitCommitHash(refName string) (string, error) {
 }
 
 // SortedGitTags retrieves sorted list of project tags with dates
-// Returns tags with creation dates in ascending order as formatted string
+// Returns tags with creation dates sorted ascending as formatted string
 // Use case: examine tag content to choose next version numbering
 //
 // SortedGitTags 获取项目标签的排序列表及日期
@@ -235,7 +211,7 @@ func (G *Gcm) SortedGitTags() (string, error) {
 }
 
 // GetTopPath retrieves the absolute path of Git repo at base location
-// Returns the top-level path and error if not in a Git repo
+// Returns the top path, fails if not in a Git repo
 // Use case: navigate to project base and resolve paths
 //
 // GetTopPath 获取 Git 仓库在基础位置的绝对路径
@@ -257,7 +233,7 @@ func (G *Gcm) GetTopPath() (string, error) {
 // 返回 .git 位置的完整路径（如 "/home/admin/project/.git"）
 // 使用场景：访问 Git 元数据、钩子和配置文件
 func (G *Gcm) GetGitDIRAbsPath() (string, error) {
-	// Use --absolute-git-dir instead of --git-dir for better usability // 使用 --absolute-git-dir 替代 --git-dir 以获得更好的可用性
+	// Use --absolute-git-dir instead of --git-dir to get absolute path // 使用 --absolute-git-dir 替代 --git-dir 以获得更好的可用性
 	output, err := G.execConfig.Exec("git", "rev-parse", "--absolute-git-dir")
 	if err != nil {
 		return "", erero.Wro(err)
@@ -266,8 +242,8 @@ func (G *Gcm) GetGitDIRAbsPath() (string, error) {
 }
 
 // GetSubPathToRoot retrieves path from current location to base
-// Returns path like "../" if in subdirs and empty string if at base
-// Use case: build paths to base-level assets
+// Returns path like "../" if in subdirs, blank if at base
+// Use case: build paths to base assets
 //
 // GetSubPathToRoot 获取从当前位置到基础的路径
 // 如果在子目录则返回如 "../" 的路径，如果在基础则返回空字符串
@@ -281,7 +257,7 @@ func (G *Gcm) GetSubPathToRoot() (string, error) {
 }
 
 // GetSubPath retrieves path from base to current location
-// Returns path like "subpath/" if in subdirs and empty string if at base
+// Returns path like "subpath/" if in subdirs, blank if at base
 // Use case: find current location within project structure
 //
 // GetSubPath 获取从基础到当前位置的路径
@@ -309,7 +285,7 @@ func (G *Gcm) IsInsideWorkTree() (bool, error) {
 }
 
 // GetCurrentBranch gets the name of the current branch
-// Returns the current branch name and error if not in a Git repo
+// Returns the current branch name, fails if not in a Git repo
 //
 // GetCurrentBranch 获取当前分支的名称
 // 如果不在 Git 仓库中则返回当前分支名称和错误
@@ -321,8 +297,8 @@ func (G *Gcm) GetCurrentBranch() (string, error) {
 	return strings.TrimSpace(string(output)), nil
 }
 
-// GetRemoteURL gets the URL of the specified remote repo
-// Returns the remote URL and error if remote does not exist
+// GetRemoteURL gets the address of the specified remote repo
+// Returns the remote address, fails if remote does not exist
 //
 // GetRemoteURL 获取指定远程仓库的URL
 // 如果远程仓库不存在则返回远程URL和错误
@@ -337,8 +313,8 @@ func (G *Gcm) GetRemoteURL(remoteName string) (string, error) {
 	return strings.TrimSpace(string(output)), nil
 }
 
-// GetCommitCount gets the total count of commits in the current branch
-// Returns the commit count and error if not in a Git repo or no commits exist
+// GetCommitCount gets the commit count in the current branch
+// Returns the commit count, fails if not in a Git repo or no commits exist
 //
 // GetCommitCount 获取当前分支的提交总数
 // 如果不在 Git 仓库中或没有提交则返回提交数量和错误
@@ -354,8 +330,8 @@ func (G *Gcm) GetCommitCount() (int, error) {
 	return count, nil
 }
 
-// ListBranches gets a list of all local branch names
-// Returns slice of branch names and error if not in a Git repo
+// ListBranches gets branch names in the repo
+// Returns slice of branch names, fails if not in a Git repo
 //
 // ListBranches 获取所有本地分支名称列表
 // 如果不在 Git 仓库中则返回分支名称切片和错误
@@ -375,8 +351,8 @@ func (G *Gcm) ListBranches() ([]string, error) {
 	return results, nil
 }
 
-// ListRemoteBranches gets a list of all remote branch names
-// Returns slice of remote branch names and error if not in a Git repo
+// ListRemoteBranches gets remote branch names in the repo
+// Returns slice of remote branch names, fails if not in a Git repo
 //
 // ListRemoteBranches 获取所有远程分支名称列表
 // 如果不在 Git 仓库中则返回远程分支名称切片和错误
@@ -397,7 +373,7 @@ func (G *Gcm) ListRemoteBranches() ([]string, error) {
 }
 
 // GetLogOneLine gets a concise commit log with specified limit
-// Returns slice of one-line commit entries and error if not in a Git repo
+// Returns slice of one-line commit entries, fails if not in a Git repo
 //
 // GetLogOneLine 获取指定数量的简洁提交日志
 // 如果不在 Git 仓库中则返回单行提交条目切片和错误
@@ -420,4 +396,204 @@ func (G *Gcm) GetLogOneLine(limit int) ([]string, error) {
 		}
 	}
 	return results, nil
+}
+
+// GetCurrentCommitHash gets the hash of HEAD commit
+// Returns commit hash string from Git command output
+// Use case: locate commit position when recording state and creating references
+//
+// GetCurrentCommitHash 获取 HEAD 提交的哈希值
+// 从 Git 命令输出返回提交哈希字符串
+// 使用场景：在记录状态和创建引用时识别提交位置
+func (G *Gcm) GetCurrentCommitHash() (string, error) {
+	output, err := G.execConfig.Exec("git", "rev-parse", "HEAD")
+	if err != nil {
+		return "", erero.Wro(err)
+	}
+	return strings.TrimSpace(string(output)), nil
+}
+
+// GetCommitMessage gets the commit message of specified reference
+// Returns commit message text with subject and message
+// Use case: examine commit contents when reviewing changes and generating notes
+//
+// GetCommitMessage 获取指定引用的提交消息
+// 返回包含主题和消息的提交消息文本
+// 使用场景：在审查更改和生成注释时检查提交内容
+func (G *Gcm) GetCommitMessage(ref string) (string, error) {
+	output, err := G.execConfig.Exec("git", "log", "-1", "--pretty=format:%B", ref)
+	if err != nil {
+		return "", erero.Wro(err)
+	}
+	return strings.TrimSpace(string(output)), nil
+}
+
+// BranchExists checks if branch exists in repo
+// Returns true if branch exists, false otherwise
+// Use case: validate branch names when switching and creating branches
+//
+// BranchExists 检查仓库中是否存在分支
+// 如果分支存在则返回 true，否则返回 false
+// 使用场景：在切换和创建分支时验证分支名称
+func (G *Gcm) BranchExists(name string) (bool, error) {
+	_, exc, err := G.execConfig.NewConfig().WithExpectExit(1, "NOT-EXIST").ExecTake("git", "show-ref", "--verify", "--quiet", "refs/heads/"+name)
+	if err != nil {
+		return false, erero.Wro(err)
+	}
+	switch exc {
+	case 0:
+		return true, nil // Branch exists // 分支存在
+	case 1:
+		return false, nil // Branch does not exist // 分支不存在
+	default:
+		return false, erero.Errorf("git show-ref failed with exit code %d", exc)
+	}
+}
+
+// RemoteBranchExists checks if remote branch exists
+// Returns true if remote branch exists, false otherwise
+// Use case: validate remote branch references when fetching and tracking
+//
+// RemoteBranchExists 检查远程分支是否存在
+// 如果远程分支存在则返回 true，否则返回 false
+// 使用场景：在获取和跟踪时验证远程分支引用
+func (G *Gcm) RemoteBranchExists(name string) (bool, error) {
+	_, exc, err := G.execConfig.NewConfig().WithExpectExit(1, "NOT-EXIST").ExecTake("git", "show-ref", "--verify", "--quiet", "refs/remotes/"+name)
+	if err != nil {
+		return false, erero.Wro(err)
+	}
+	switch exc {
+	case 0:
+		return true, nil // Remote branch exists // 远程分支存在
+	case 1:
+		return false, nil // Remote branch does not exist // 远程分支不存在
+	default:
+		return false, erero.Errorf("git show-ref failed with exit code %d", exc)
+	}
+}
+
+// TagExists checks if tag exists in repo
+// Returns true if tag exists, false otherwise
+// Use case: prevent duplicate tag creation and validate tag references
+//
+// TagExists 检查仓库中是否存在标签
+// 如果标签存在则返回 true，否则返回 false
+// 使用场景：防止重复创建标签和验证标签引用
+func (G *Gcm) TagExists(name string) (bool, error) {
+	_, exc, err := G.execConfig.NewConfig().WithExpectExit(1, "NOT-EXIST").ExecTake("git", "show-ref", "--verify", "--quiet", "refs/tags/"+name)
+	if err != nil {
+		return false, erero.Wro(err)
+	}
+	switch exc {
+	case 0:
+		return true, nil // Tag exists // 标签存在
+	case 1:
+		return false, nil // Tag does not exist // 标签不存在
+	default:
+		return false, erero.Errorf("git show-ref failed with exit code %d", exc)
+	}
+}
+
+// GetFileList gets tracked files in the repo
+// Returns paths of files tracked with Git
+// Use case: examine repo contents and validate file existence when processing assets
+//
+// GetFileList 获取仓库中的跟踪文件
+// 返回 Git 跟踪的文件路径
+// 使用场景：检查仓库内容并在处理资源时验证文件存在
+func (G *Gcm) GetFileList() ([]string, error) {
+	output, err := G.execConfig.Exec("git", "ls-files")
+	if err != nil {
+		return nil, erero.Wro(err)
+	}
+	var files []string
+	for _, line := range strings.Split(strings.TrimSpace(string(output)), "\n") {
+		line = strings.TrimSpace(line)
+		if line != "" {
+			files = append(files, line)
+		}
+	}
+	return files, nil
+}
+
+// GetUntrackedFiles gets files not tracked with Git
+// Returns paths of files in working path but not in version management
+// Use case: find new files when staging changes and cleaning workspace
+//
+// GetUntrackedFiles 获取未被 Git 跟踪的文件
+// 返回工作路径中但不在版本管理中的文件路径
+// 使用场景：在暂存更改和清理工作空间时识别新文件
+func (G *Gcm) GetUntrackedFiles() ([]string, error) {
+	output, err := G.execConfig.Exec("git", "ls-files", "--others", "--exclude-standard")
+	if err != nil {
+		return nil, erero.Wro(err)
+	}
+	var files []string
+	for _, line := range strings.Split(strings.TrimSpace(string(output)), "\n") {
+		line = strings.TrimSpace(line)
+		if line != "" {
+			files = append(files, line)
+		}
+	}
+	return files, nil
+}
+
+// GetModifiedFiles gets files with uncommitted modifications
+// Returns paths of files changed in working path and staging area
+// Use case: find affected files when reviewing changes and staging
+//
+// GetModifiedFiles 获取有未提交修改的文件
+// 返回工作路径和暂存区中已更改文件的路径
+// 使用场景：在审查更改和选择性暂存时识别受影响的文件
+func (G *Gcm) GetModifiedFiles() ([]string, error) {
+	output, err := G.execConfig.Exec("git", "diff", "--name-only", "HEAD")
+	if err != nil {
+		return nil, erero.Wro(err)
+	}
+	var files []string
+	for _, line := range strings.Split(strings.TrimSpace(string(output)), "\n") {
+		line = strings.TrimSpace(line)
+		if line != "" {
+			files = append(files, line)
+		}
+	}
+	return files, nil
+}
+
+// GetBranchTrackingBranch gets the upstream branch of specified branch
+// Returns upstream branch name in format "remote/branch"
+// Use case: check tracking configuration and understand remote connections
+//
+// GetBranchTrackingBranch 获取指定分支的上游分支
+// 返回格式为 "remote/branch" 的上游分支名称
+// 使用场景：验证跟踪配置和了解远程连接
+func (G *Gcm) GetBranchTrackingBranch(branch string) (string, error) {
+	output, err := G.execConfig.Exec("git", "rev-parse", "--abbrev-ref", branch+"@{upstream}")
+	if err != nil {
+		return "", erero.Wro(err)
+	}
+	return strings.TrimSpace(string(output)), nil
+}
+
+// GetIgnoredFiles gets files git ignores in the repo
+// Returns paths of files matching gitignore rules
+// Use case: find ignored files when cleaning workspace and checking config
+//
+// GetIgnoredFiles 获取仓库中被 git 忽略的文件
+// 返回匹配 gitignore 规则的文件路径
+// 使用场景：在清理工作空间和检查配置时识别被忽略的文件
+func (G *Gcm) GetIgnoredFiles() ([]string, error) {
+	output, err := G.execConfig.Exec("git", "status", "--ignored", "-s", "--", ".")
+	if err != nil {
+		return nil, erero.Wro(err)
+	}
+	var regexpIgnore = regexp.MustCompile(`^!!\s*(.+)$`)
+	var paths []string
+	for _, item := range strings.Split(string(output), "\n") {
+		item = strings.TrimSpace(item)
+		if m := regexpIgnore.FindStringSubmatch(item); len(m) > 0 {
+			paths = append(paths, m[1])
+		}
+	}
+	return paths, nil
 }

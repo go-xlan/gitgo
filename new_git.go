@@ -23,7 +23,7 @@ import (
 // State Management:
 // - execConfig: Execution configuration with working path context
 // - output: Command output bytes from recent operations (both success and failures)
-// - errorOnce: First error encountered in chain (becomes nil when operations succeed)
+// - errorOnce: First issue encountered in chain (becomes clear when operations succeed)
 // - debugMode: Activates detailed debug logging with colored console output
 //
 // Gcm 代表 Git 命令引擎，支持链式调用和集成处理
@@ -89,7 +89,7 @@ func newOkGcm(execConfig *osexec.ExecConfig, output []byte, debugMode bool) *Gcm
 
 // newWaGcm creates a failed-state Gcm instance with red logging in debug mode
 // This function builds Gcm with captured errors to stop command chains
-// Shows red-tinted messages with error details when debugging
+// Shows red-tinted messages with issue details when debugging
 //
 // newWaGcm 在调试模式下创建带有红色日志的失败状态 Gcm 实例
 // 该函数构建具有捕获错误的 Gcm 以停止命令链
@@ -122,8 +122,8 @@ func (G *Gcm) Result() ([]byte, error) {
 }
 
 // Output returns the raw output bytes from command execution
-// Provides access to command output without error information
-// Use case: extract command results when error handling happens in different places
+// Provides access to command output without issue information
+// Use case: extract command results when issue handling happens in different places
 //
 // Output 返回命令执行的原始输出字节
 // 提供对命令输出的访问，不包含错误信息
@@ -133,8 +133,8 @@ func (G *Gcm) Output() []byte {
 }
 
 // Reason returns the first error that happened in the command chains
-// Provides access to error information without command output data
-// Use case: check error state when output data is not needed
+// Provides access to issue information without command output data
+// Use case: check issue state when output data is not needed
 //
 // Reason 返回命令链中发生的第一个错误
 // 提供对错误信息的访问，不包含命令输出数据
@@ -328,8 +328,8 @@ func (G *Gcm) When(condition func(*Gcm) bool, run func(*Gcm) *Gcm) *Gcm {
 }
 
 // WhenThen executes functions with condition checks and error handling
-// Supports complex condition-based logic with error propagation in chains
-// Use case: condition-based workflows with error management and validation
+// Supports complex condition-based logic with issue propagation in chains
+// Use case: condition-based workflows with issue management and validation
 //
 // WhenThen 执行函数并进行条件检查和错误处理
 // 支持在链中进行错误传播的复杂条件逻辑

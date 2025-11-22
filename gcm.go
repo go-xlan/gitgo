@@ -199,3 +199,91 @@ func (G *Gcm) PushTags() *Gcm {
 func (G *Gcm) PushTag(tag string) *Gcm {
 	return G.do("git", "push", "origin", tag)
 }
+
+// Remote lists configured remote repositories
+// Shows remote names and URLs to view connections
+// Use case: check remote configuration and confirm repo connections
+//
+// Remote 列出配置的远程仓库
+// 显示远程名称和 URL 以查看连接
+// 使用场景：检查远程配置和验证仓库连接
+func (G *Gcm) Remote() *Gcm {
+	return G.do("git", "remote", "-v")
+}
+
+// RemoteAdd adds a new remote repo connection
+// Creates named reference to outside repo location
+// Use case: set up connection to upstream repo and add forks
+//
+// RemoteAdd 添加新的远程仓库连接
+// 创建对外部仓库位置的命名引用
+// 使用场景：设置与上游仓库的连接和添加分支
+func (G *Gcm) RemoteAdd(name, url string) *Gcm {
+	return G.do("git", "remote", "add", name, url)
+}
+
+// RemoteRemove removes existing remote repo connection
+// Deletes named remote reference from configuration
+// Use case: clean up unused remotes and remove obsolete connections
+//
+// RemoteRemove 删除现有的远程仓库连接
+// 从配置中删除命名的远程引用
+// 使用场景：清理未使用的远程和删除过时的连接
+func (G *Gcm) RemoteRemove(name string) *Gcm {
+	return G.do("git", "remote", "remove", name)
+}
+
+// RemoteSet updates URL of existing remote connection
+// Changes the location reference to point at new address
+// Use case: switch from HTTPS to SSH and update repo migration URLs
+//
+// RemoteSet 更新现有远程连接的 URL
+// 更改位置引用以指向新地址
+// 使用场景：从 HTTPS 切换到 SSH 和更新仓库迁移 URL
+func (G *Gcm) RemoteSet(name, remoteLink string) *Gcm {
+	return G.do("git", "remote", "set-url", name, remoteLink)
+}
+
+// Fetch downloads objects and refs from remote repo
+// Gets recent commits from specified remote without merging
+// Use case: check remote changes when inspecting updates without merging
+//
+// Fetch 从远程仓库下载对象和引用
+// 从指定远程获取最新提交而不合并
+// 使用场景：在不合并的情况下检查远程更改以检查更新
+func (G *Gcm) Fetch(remote string) *Gcm {
+	return G.do("git", "fetch", remote)
+}
+
+// FetchAll downloads objects and refs from configured remotes
+// Gets recent commits from each remote in one operation
+// Use case: sync with multiple remotes when updating forks
+//
+// FetchAll 从配置的远程仓库下载对象和引用
+// 在一次操作中从每个远程获取最新提交
+// 使用场景：在更新分支时与多个远程同步
+func (G *Gcm) FetchAll() *Gcm {
+	return G.do("git", "fetch", "--all")
+}
+
+// PullFrom fetches and merges from specified remote and branch
+// Downloads changes from specified branch and integrates them
+// Use case: sync with non-default remote and branch combinations
+//
+// PullFrom 从指定远程和分支获取并合并
+// 从指定分支下载更改并集成它们
+// 使用场景：与非默认远程和分支组合同步
+func (G *Gcm) PullFrom(remote, branch string) *Gcm {
+	return G.do("git", "pull", remote, branch)
+}
+
+// PushTo pushes commits to specified remote and branch
+// Uploads branch changes to specified remote target
+// Use case: push to non-default remotes and custom branch destinations
+//
+// PushTo 将提交推送到指定远程和分支
+// 将分支更改上传到指定远程目标
+// 使用场景：推送到非默认远程和自定义分支目标
+func (G *Gcm) PushTo(remote, branch string) *Gcm {
+	return G.do("git", "push", remote, branch)
+}

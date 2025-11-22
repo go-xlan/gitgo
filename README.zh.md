@@ -1,7 +1,7 @@
 [![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/go-xlan/gitgo/release.yml?branch=main&label=BUILD)](https://github.com/go-xlan/gitgo/actions/workflows/release.yml?query=branch%3Amain)
 [![GoDoc](https://pkg.go.dev/badge/github.com/go-xlan/gitgo)](https://pkg.go.dev/github.com/go-xlan/gitgo)
 [![Coverage Status](https://img.shields.io/coveralls/github/go-xlan/gitgo/main.svg)](https://coveralls.io/github/go-xlan/gitgo?branch=main)
-[![Supported Go Versions](https://img.shields.io/badge/Go-1.22--1.25-lightgrey.svg)](https://github.com/go-xlan/gitgo)
+[![Supported Go Versions](https://img.shields.io/badge/Go-1.25+-lightgrey.svg)](https://github.com/go-xlan/gitgo)
 [![GitHub Release](https://img.shields.io/github/release/go-xlan/gitgo.svg)](https://github.com/go-xlan/gitgo/releases)
 [![Go Report Card](https://goreportcard.com/badge/github.com/go-xlan/gitgo)](https://goreportcard.com/report/github.com/go-xlan/gitgo)
 
@@ -196,6 +196,7 @@ func main() {
 - `GetCommitCount() (int, error)` - 获取提交数量
 - `GitCommitHash(ref) (string, error)` - 使用引用获取提交哈希
 - `GetRemoteURL(remote) (string, error)` - 获取远程仓库 URL
+- `GetIgnoredFiles() ([]string, error)` - 获取 gitignore 忽略的文件
 
 ### 问题处理
 
