@@ -776,6 +776,105 @@ func TestGcm_LatestGitTag_Temp(t *testing.T) {
 	require.Equal(t, "v2.0.0", tag)
 }
 
+// TestGetLatestTag tests GetLatestTag with 0, 1, and 2 tags scenarios
+// Verifies correct handling when no tags exist, one tag exists, and multiple tags exist
+//
+// TestGetLatestTag 测试 GetLatestTag 在 0、1、2 个标签场景
+// 验证在没有标签、1个标签和多个标签时的处理
+func TestGetLatestTag(t *testing.T) {
+	t.Run("ZeroTags", func(t *testing.T) {
+		// Create temp DIR with git repo but no tags
+		// 创建临时目录和 git 仓库但不创建标签
+		tempDIR := rese.V1(os.MkdirTemp("", "gitgo-get-latest-tag-zero-*"))
+		defer func() {
+			must.Done(os.RemoveAll(tempDIR))
+		}()
+
+		gcm := gitgo.New(tempDIR)
+		gcm.Init().Done()
+
+		// Create initial commit
+		// 创建初始提交
+		must.Done(os.WriteFile(filepath.Join(tempDIR, "init.txt"), []byte("init"), 0644))
+		gcm.Add().Commit("initial").Done()
+
+		// Test GetLatestTag with no tags
+		// 测试没有标签时的 GetLatestTag
+		tag, exists, err := gcm.GetLatestTag()
+		require.NoError(t, err)
+		require.False(t, exists)
+		require.Equal(t, "", tag)
+		t.Log("No tags: exists=", exists)
+	})
+
+	t.Run("OneTag", func(t *testing.T) {
+		// Create temp DIR with git repo and one tag
+		// 创建临时目录、git 仓库和一个标签
+		tempDIR := rese.V1(os.MkdirTemp("", "gitgo-get-latest-tag-one-*"))
+		defer func() {
+			must.Done(os.RemoveAll(tempDIR))
+		}()
+
+		gcm := gitgo.New(tempDIR)
+		gcm.Init().Done()
+
+		// Create initial commit
+		// 创建初始提交
+		must.Done(os.WriteFile(filepath.Join(tempDIR, "init.txt"), []byte("init"), 0644))
+		gcm.Add().Commit("initial").Done()
+
+		// Create one tag
+		// 创建一个标签
+		gcm.Tag("v0.0.1").Done()
+
+		// Test GetLatestTag with one tag
+		// 测试存在一个标签时的 GetLatestTag
+		tag, exists, err := gcm.GetLatestTag()
+		require.NoError(t, err)
+		require.True(t, exists)
+		require.Equal(t, "v0.0.1", tag)
+		t.Log("One tag: tag=", tag, "exists=", exists)
+	})
+
+	t.Run("TwoTags", func(t *testing.T) {
+		// Create temp DIR with git repo and two tags
+		// 创建临时目录、git 仓库和两个标签
+		tempDIR := rese.V1(os.MkdirTemp("", "gitgo-get-latest-tag-two-*"))
+		defer func() {
+			must.Done(os.RemoveAll(tempDIR))
+		}()
+
+		gcm := gitgo.New(tempDIR)
+		gcm.Init().Done()
+
+		// Create initial commit
+		// 创建初始提交
+		must.Done(os.WriteFile(filepath.Join(tempDIR, "init.txt"), []byte("init"), 0644))
+		gcm.Add().Commit("initial").Done()
+
+		// Create first tag
+		// 创建第一个标签
+		gcm.Tag("v0.0.1").Done()
+
+		// Create second commit
+		// 创建第二次提交
+		must.Done(os.WriteFile(filepath.Join(tempDIR, "second.txt"), []byte("second"), 0644))
+		gcm.Add().Commit("second").Done()
+
+		// Create second tag
+		// 创建第二个标签
+		gcm.Tag("v0.0.2").Done()
+
+		// Test GetLatestTag with two tags, should get the latest one
+		// 测试存在两个标签时的 GetLatestTag，应该获取最新的标签
+		tag, exists, err := gcm.GetLatestTag()
+		require.NoError(t, err)
+		require.True(t, exists)
+		require.Equal(t, "v0.0.2", tag)
+		t.Log("Two tags: tag=", tag, "exists=", exists)
+	})
+}
+
 // TestGcm_GetBranchTrackingBranch tests getting upstream branch
 // Verifies GetBranchTrackingBranch returns correct tracking info
 //

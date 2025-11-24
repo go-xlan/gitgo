@@ -146,7 +146,7 @@ func main() {
 
 	gcm := gitgo.New(tempDIR)
 	gcm.Init().Done()
-	zaplog.SUG.Info("repo ready")
+	zaplog.SUG.Info("repo setup complete")
 
 	must.Done(os.WriteFile(filepath.Join(tempDIR, "app.txt"), []byte("v1"), 0644))
 	gcm.Add().Commit("v1").Tag("v1.0.0").Done()
@@ -160,7 +160,7 @@ func main() {
 	zaplog.SUG.Info("latest tag:", latest)
 
 	count := rese.V1(gcm.GetCommitCount())
-	zaplog.SUG.Info("total commits:", count)
+	zaplog.SUG.Info("commit count:", count)
 }
 ```
 
@@ -197,6 +197,11 @@ func main() {
 - `GitCommitHash(ref) (string, error)` - 使用引用获取提交哈希
 - `GetRemoteURL(remote) (string, error)` - 获取远程仓库 URL
 - `GetIgnoredFiles() ([]string, error)` - 获取 gitignore 忽略的文件
+
+### 标签操作
+
+- `LatestGitTag() (string, error)` - 获取最新标签名称（没有标签时会失败）
+- `GetLatestTag() (string, bool, error)` - 获取最新标签名称并检查是否存在
 
 ### 问题处理
 

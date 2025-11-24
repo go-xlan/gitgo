@@ -146,7 +146,7 @@ func main() {
 
 	gcm := gitgo.New(tempDIR)
 	gcm.Init().Done()
-	zaplog.SUG.Info("repo ready")
+	zaplog.SUG.Info("repo setup complete")
 
 	must.Done(os.WriteFile(filepath.Join(tempDIR, "app.txt"), []byte("v1"), 0644))
 	gcm.Add().Commit("v1").Tag("v1.0.0").Done()
@@ -160,7 +160,7 @@ func main() {
 	zaplog.SUG.Info("latest tag:", latest)
 
 	count := rese.V1(gcm.GetCommitCount())
-	zaplog.SUG.Info("total commits:", count)
+	zaplog.SUG.Info("commit count:", count)
 }
 ```
 
@@ -197,6 +197,11 @@ func main() {
 - `GitCommitHash(ref) (string, error)` - Get commit hash with reference
 - `GetRemoteURL(remote) (string, error)` - Get remote repo URL
 - `GetIgnoredFiles() ([]string, error)` - Get files ignored in gitignore
+
+### Tag Operations
+
+- `LatestGitTag() (string, error)` - Get latest tag name (fails when no tags exist)
+- `GetLatestTag() (string, bool, error)` - Get latest tag name with existence check
 
 ### Issue Handling
 

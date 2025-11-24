@@ -20,7 +20,7 @@ func main() {
 
 	gcm := gitgo.New(tempDIR)
 	gcm.Init().Done()
-	zaplog.SUG.Info("repo ready")
+	zaplog.SUG.Info("repo setup complete")
 
 	must.Done(os.WriteFile(filepath.Join(tempDIR, "app.txt"), []byte("v1"), 0644))
 	gcm.Add().Commit("v1").Tag("v1.0.0").Done()
@@ -34,5 +34,5 @@ func main() {
 	zaplog.SUG.Info("latest tag:", latest)
 
 	count := rese.V1(gcm.GetCommitCount())
-	zaplog.SUG.Info("total commits:", count)
+	zaplog.SUG.Info("commit count:", count)
 }

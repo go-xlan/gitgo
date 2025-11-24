@@ -128,6 +128,28 @@ func (G *Gcm) LatestGitTag() (string, error) {
 	return strings.TrimSpace(string(output)), nil
 }
 
+// GetLatestTag retrieves the latest tag name if it exists
+// Returns tag name, exists flag, and possible errors
+// When no tags exist, returns ("", false, nil)
+//
+// GetLatestTag 获取最新标签名称（如果存在）
+// 返回标签名称、存在标志和可能的错误
+// 当没有标签时，返回 ("", false, nil)
+func (G *Gcm) GetLatestTag() (string, bool, error) {
+	output, exc, err := G.execConfig.NewConfig().WithExpectExit(128, "NO-TAGS").ExecTake("git", "describe", "--tags", "--abbrev=0")
+	if err != nil {
+		return "", false, erero.Wro(err)
+	}
+	switch exc {
+	case 0:
+		return strings.TrimSpace(string(output)), true, nil // Tag exists // 标签存在
+	case 128:
+		return "", false, nil // No tags exist // 没有标签
+	default:
+		return "", false, erero.Errorf("git describe failed with exit code %d", exc)
+	}
+}
+
 // LatestGitTagHasPrefix retrieves the latest tag name with the specified prefix
 // Returns the most recent tag that starts with the given prefix
 // Helps find version tags on specific subprojects and components
