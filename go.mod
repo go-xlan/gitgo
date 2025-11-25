@@ -11,7 +11,7 @@ require (
 	github.com/yyle88/osexec v0.0.34
 	github.com/yyle88/osexistpath v0.0.18
 	github.com/yyle88/rese v0.0.12
-	github.com/yyle88/runpath v1.0.24
+	github.com/yyle88/runpath v1.0.25
 	github.com/yyle88/zaplog v0.0.27
 )
 

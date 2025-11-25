@@ -14,12 +14,12 @@ import (
 	"github.com/yyle88/runpath"
 )
 
-// TestGcm_HasStagingChanges tests detection of staged changes in the Git space
+// TestGcm_HasStagedChanges tests detection of staged changes in the Git space
 // Verifies that the function identifies if changes are in staging area
-func TestGcm_HasStagingChanges(t *testing.T) {
+func TestGcm_HasStagedChanges(t *testing.T) {
 	gcm := gitgo.New(runpath.PARENT.Path())
 
-	changes, err := gcm.HasStagingChanges()
+	changes, err := gcm.HasStagedChanges()
 	require.NoError(t, err)
 	t.Log(changes)
 }
@@ -34,16 +34,14 @@ func TestGcm_HasUnstagedChanges(t *testing.T) {
 	t.Log(changes)
 }
 
-// TestGcm_HasStagingChanges_True tests HasStagingChanges returns true with staged changes
+// TestGcm_HasStagedChanges_True tests HasStagedChanges returns true with staged changes
 // Verifies exit code 1 scenario where staged changes exist
 //
-// TestGcm_HasStagingChanges_True 测试有暂存更改时 HasStagingChanges 返回 true
+// TestGcm_HasStagedChanges_True 测试有暂存更改时 HasStagedChanges 返回 true
 // 验证退出码 1 场景，即存在暂存更改
-func TestGcm_HasStagingChanges_True(t *testing.T) {
+func TestGcm_HasStagedChanges_True(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-has-staging-true-*"))
-	defer func() {
-		must.Done(os.RemoveAll(tempDIR))
-	}()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	gcm := gitgo.New(tempDIR)
 	gcm.Init().Done()
@@ -54,20 +52,18 @@ func TestGcm_HasStagingChanges_True(t *testing.T) {
 	must.Done(os.WriteFile(filepath.Join(tempDIR, "new.txt"), []byte("new"), 0644))
 	gcm.Add().Done()
 
-	has := rese.V1(gcm.HasStagingChanges())
+	has := rese.V1(gcm.HasStagedChanges())
 	require.True(t, has)
 }
 
-// TestGcm_HasStagingChanges_False tests HasStagingChanges returns false without staged changes
+// TestGcm_HasStagedChanges_False tests HasStagedChanges returns false without staged changes
 // Verifies exit code 0 scenario where no staged changes exist
 //
-// TestGcm_HasStagingChanges_False 测试无暂存更改时 HasStagingChanges 返回 false
+// TestGcm_HasStagedChanges_False 测试无暂存更改时 HasStagedChanges 返回 false
 // 验证退出码 0 场景，即不存在暂存更改
-func TestGcm_HasStagingChanges_False(t *testing.T) {
+func TestGcm_HasStagedChanges_False(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-has-staging-false-*"))
-	defer func() {
-		must.Done(os.RemoveAll(tempDIR))
-	}()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	gcm := gitgo.New(tempDIR)
 	gcm.Init().Done()
@@ -75,7 +71,7 @@ func TestGcm_HasStagingChanges_False(t *testing.T) {
 	must.Done(os.WriteFile(filepath.Join(tempDIR, "init.txt"), []byte("init"), 0644))
 	gcm.Add().Commit("initial").Done()
 
-	has := rese.V1(gcm.HasStagingChanges())
+	has := rese.V1(gcm.HasStagedChanges())
 	require.False(t, has)
 }
 
@@ -86,9 +82,7 @@ func TestGcm_HasStagingChanges_False(t *testing.T) {
 // 验证退出码 1 场景，即存在未暂存更改
 func TestGcm_HasUnstagedChanges_True(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-has-unstaged-true-*"))
-	defer func() {
-		must.Done(os.RemoveAll(tempDIR))
-	}()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	gcm := gitgo.New(tempDIR)
 	gcm.Init().Done()
@@ -109,9 +103,7 @@ func TestGcm_HasUnstagedChanges_True(t *testing.T) {
 // 验证退出码 0 场景，即不存在未暂存更改
 func TestGcm_HasUnstagedChanges_False(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-has-unstaged-false-*"))
-	defer func() {
-		must.Done(os.RemoveAll(tempDIR))
-	}()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	gcm := gitgo.New(tempDIR)
 	gcm.Init().Done()
@@ -140,9 +132,7 @@ func TestGcm_HasChanges(t *testing.T) {
 // 验证退出码 1 场景，即存在更改
 func TestGcm_HasChanges_True(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-has-changes-true-*"))
-	defer func() {
-		must.Done(os.RemoveAll(tempDIR))
-	}()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	gcm := gitgo.New(tempDIR)
 	gcm.Init().Done()
@@ -163,9 +153,7 @@ func TestGcm_HasChanges_True(t *testing.T) {
 // 验证退出码 0 场景，即不存在更改
 func TestGcm_HasChanges_False(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-has-changes-false-*"))
-	defer func() {
-		must.Done(os.RemoveAll(tempDIR))
-	}()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	gcm := gitgo.New(tempDIR)
 	gcm.Init().Done()
@@ -177,12 +165,12 @@ func TestGcm_HasChanges_False(t *testing.T) {
 	require.False(t, has)
 }
 
-// TestGcm_GetPorcelainStatus tests fetch of clean status information
+// TestGcm_GetStatusPorcelain tests fetch of clean status information
 // Verifies that the function returns accurate porcelain format status output
-func TestGcm_GetPorcelainStatus(t *testing.T) {
+func TestGcm_GetStatusPorcelain(t *testing.T) {
 	gcm := gitgo.New(runpath.PARENT.Path())
 
-	status, err := gcm.GetPorcelainStatus()
+	status, err := gcm.GetStatusPorcelain()
 	require.NoError(t, err)
 	t.Log(status)
 }
@@ -208,9 +196,7 @@ func TestGcm_CheckStagedChanges(t *testing.T) {
 // 验证退出码 1 场景，即存在暂存更改
 func TestGcm_CheckStagedChanges_HasChanges(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-staged-has-*"))
-	defer func() {
-		must.Done(os.RemoveAll(tempDIR))
-	}()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	gcm := gitgo.New(tempDIR)
 	gcm.Init().Done()
@@ -234,9 +220,7 @@ func TestGcm_CheckStagedChanges_HasChanges(t *testing.T) {
 // 验证退出码 0 场景，即不存在暂存更改
 func TestGcm_CheckStagedChanges_NoChanges(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-staged-non-*"))
-	defer func() {
-		must.Done(os.RemoveAll(tempDIR))
-	}()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	gcm := gitgo.New(tempDIR)
 	gcm.Init().Done()
@@ -251,78 +235,71 @@ func TestGcm_CheckStagedChanges_NoChanges(t *testing.T) {
 	require.Contains(t, err.Error(), "NON-STAGED-CHANGES")
 }
 
-// TestLatestGitTag tests fetch of the most recent tag in the project
-// Verifies that the function returns the latest tag name right
-func TestLatestGitTag(t *testing.T) {
-	gcm := gitgo.New(runpath.PARENT.Path()).WithDebug()
-	tag, err := gcm.LatestGitTag()
-	require.NoError(t, err)
-	t.Log(tag)
-	require.NotEmpty(t, tag)
-}
-
-// TestGcm_LatestGitTagHasPrefix tests fetch of latest tag with specific prefix
+// TestGcm_GetLatestTagHasPrefix tests fetch of latest tag with specific prefix
 // Verifies that the function filters tags with prefix pattern
-func TestGcm_LatestGitTagHasPrefix(t *testing.T) {
+func TestGcm_GetLatestTagHasPrefix(t *testing.T) {
 	gcm := gitgo.New(runpath.PARENT.Path()).WithDebug()
-	tag, err := gcm.LatestGitTagHasPrefix("v")
+	tag, err := gcm.GetLatestTagHasPrefix("v")
 	require.NoError(t, err)
 	t.Log(tag)
 	require.NotEmpty(t, tag)
 }
 
-// TestGcm_LatestGitTagHasPrefix_Compare compares common tag fetch with prefix matching
+// TestGcm_GetLatestTagHasPrefix_Compare compares common tag fetch with prefix matching
 // Demonstrates that prefix-matched tags can be distinct from the most recent tag
-func TestGcm_LatestGitTagHasPrefix_Compare(t *testing.T) {
+func TestGcm_GetLatestTagHasPrefix_Compare(t *testing.T) {
 	gcm := gitgo.New(runpath.PARENT.Path()).WithDebug()
-	tagA := rese.C1(gcm.LatestGitTag())
+	tagA, exists, err := gcm.GetLatestTag()
+	require.NoError(t, err)
+	require.True(t, exists)
 	t.Log(tagA)
-	tagB := rese.C1(gcm.LatestGitTagHasPrefix("v"))
+	tagB := rese.C1(gcm.GetLatestTagHasPrefix("v"))
 	t.Log(tagB)
 	// Log without assertion - tags can be different // 只打印不断言相等，因为标签可能不同
 	t.Log("tag-A:", tagA, "tag-B:", tagB)
 }
 
-// TestGcm_LatestGitTagMatchRegexp tests fetch of latest tag matching glob pattern
+// TestGcm_GetLatestTagMatchGlob tests fetch of latest tag matching glob pattern
 // Verifies that the function filters tags using wildcards
-func TestGcm_LatestGitTagMatchRegexp(t *testing.T) {
+func TestGcm_GetLatestTagMatchGlob(t *testing.T) {
 	gcm := gitgo.New(runpath.PARENT.Path()).WithDebug()
-	tag, err := gcm.LatestGitTagMatchRegexp("v[0-9]*.[0-9]*.[0-9]*")
+	tag, err := gcm.GetLatestTagMatchGlob("v[0-9]*.[0-9]*.[0-9]*")
 	require.NoError(t, err)
 	t.Log(tag)
 	require.NotEmpty(t, tag)
 }
 
-// TestGitCommitHash tests fetch of commit hash with branch reference
+// TestGetCommitHash tests fetch of commit hash with branch reference
 // Verifies that the function resolves branch name to commit hash
-func TestGitCommitHash(t *testing.T) {
+func TestGetCommitHash(t *testing.T) {
 	gcm := gitgo.New(runpath.PARENT.Path()).WithDebug()
-	hash, err := gcm.GitCommitHash("main")
+	hash, err := gcm.GetCommitHash("main")
 	require.NoError(t, err)
 	t.Log(hash)
 	require.NotEmpty(t, hash)
 }
 
-// TestGitCommitHash_TAG tests fetch of commit hash with tag reference
+// TestGetCommitHash_TAG tests fetch of commit hash with tag reference
 // Verifies that the function resolves tag name to commit hash
-func TestGitCommitHash_TAG(t *testing.T) {
+func TestGetCommitHash_TAG(t *testing.T) {
 	gcm := gitgo.New(runpath.PARENT.Path()).WithDebug()
-	tag, err := gcm.LatestGitTag()
+	tag, exists, err := gcm.GetLatestTag()
 	require.NoError(t, err)
+	require.True(t, exists)
 	t.Log(tag)
 	require.NotEmpty(t, tag)
 
-	hash, err := gcm.GitCommitHash(tag)
+	hash, err := gcm.GetCommitHash(tag)
 	require.NoError(t, err)
 	t.Log(hash)
 	require.NotEmpty(t, hash)
 }
 
-// TestGcm_SortedGitTags tests fetch of sorted tag list with dates
+// TestGcm_GetSortedTags tests fetch of sorted tag list with dates
 // Verifies that the function returns tags in ascending time sequence
-func TestGcm_SortedGitTags(t *testing.T) {
+func TestGcm_GetSortedTags(t *testing.T) {
 	gcm := gitgo.New(runpath.PARENT.Path()).WithDebug()
-	tag, err := gcm.SortedGitTags()
+	tag, err := gcm.GetSortedTags()
 	require.NoError(t, err)
 	t.Log(tag)
 	require.NotEmpty(t, tag)
@@ -456,9 +433,7 @@ func TestGcm_GetLogOneLine(t *testing.T) {
 // 验证 GetCurrentCommitHash 返回提交哈希字符串
 func TestGcm_GetCurrentCommitHash(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-hash-*"))
-	defer func() {
-		must.Done(os.RemoveAll(tempDIR))
-	}()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	gcm := gitgo.New(tempDIR)
 	gcm.Init().Done()
@@ -478,9 +453,7 @@ func TestGcm_GetCurrentCommitHash(t *testing.T) {
 // 验证 GetCommitMessage 检索消息文本
 func TestGcm_GetCommitMessage(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-message-*"))
-	defer func() {
-		must.Done(os.RemoveAll(tempDIR))
-	}()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	gcm := gitgo.New(tempDIR)
 	gcm.Init().Done()
@@ -500,9 +473,7 @@ func TestGcm_GetCommitMessage(t *testing.T) {
 // 验证 BranchExists 检测现有和不存在的分支
 func TestGcm_BranchExists(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-branch-*"))
-	defer func() {
-		must.Done(os.RemoveAll(tempDIR))
-	}()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	gcm := gitgo.New(tempDIR)
 	gcm.Init().Done()
@@ -528,9 +499,7 @@ func TestGcm_BranchExists(t *testing.T) {
 func TestGcm_RemoteBranchExists(t *testing.T) {
 	// Create remote repo // 创建远程仓库
 	remoteDIR := rese.V1(os.MkdirTemp("", "gitgo-remote-repo-*"))
-	defer func() {
-		must.Done(os.RemoveAll(remoteDIR))
-	}()
+	t.Cleanup(func() { must.Done(os.RemoveAll(remoteDIR)) })
 	remoteGcm := gitgo.New(remoteDIR)
 	remoteGcm.Init().Done()
 	must.Done(os.WriteFile(filepath.Join(remoteDIR, "test.txt"), []byte("test"), 0644))
@@ -538,9 +507,7 @@ func TestGcm_RemoteBranchExists(t *testing.T) {
 
 	// Create test repo and add remote // 创建本地仓库并添加远程
 	localDIR := rese.V1(os.MkdirTemp("", "gitgo-local-repo-*"))
-	defer func() {
-		must.Done(os.RemoveAll(localDIR))
-	}()
+	t.Cleanup(func() { must.Done(os.RemoveAll(localDIR)) })
 	localGcm := gitgo.New(localDIR)
 	localGcm.Init().Done()
 	must.Done(os.WriteFile(filepath.Join(localDIR, "local.txt"), []byte("local"), 0644))
@@ -566,9 +533,7 @@ func TestGcm_RemoteBranchExists(t *testing.T) {
 // 验证 TagExists 检测现有和不存在的标签
 func TestGcm_TagExists(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-tag-*"))
-	defer func() {
-		must.Done(os.RemoveAll(tempDIR))
-	}()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	gcm := gitgo.New(tempDIR)
 	gcm.Init().Done()
@@ -583,16 +548,14 @@ func TestGcm_TagExists(t *testing.T) {
 	require.False(t, exists)
 }
 
-// TestGcm_GetFileList tests getting tracked files
-// Verifies GetFileList returns tracked file paths
+// TestGcm_GetTrackedFiles tests getting tracked files
+// Verifies GetTrackedFiles returns tracked file paths
 //
-// TestGcm_GetFileList 测试获取跟踪文件
-// 验证 GetFileList 返回跟踪文件路径
-func TestGcm_GetFileList(t *testing.T) {
+// TestGcm_GetTrackedFiles 测试获取跟踪文件
+// 验证 GetTrackedFiles 返回跟踪文件路径
+func TestGcm_GetTrackedFiles(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-files-*"))
-	defer func() {
-		must.Done(os.RemoveAll(tempDIR))
-	}()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	gcm := gitgo.New(tempDIR)
 	gcm.Init().Done()
@@ -601,7 +564,7 @@ func TestGcm_GetFileList(t *testing.T) {
 	must.Done(os.WriteFile(filepath.Join(tempDIR, "file2.txt"), []byte("test"), 0644))
 	gcm.Add().Commit("add files").Done()
 
-	files := rese.V1(gcm.GetFileList())
+	files := rese.V1(gcm.GetTrackedFiles())
 	require.Contains(t, files, "file1.txt")
 	require.Contains(t, files, "file2.txt")
 }
@@ -613,9 +576,7 @@ func TestGcm_GetFileList(t *testing.T) {
 // 验证 GetUntrackedFiles 返回未跟踪文件路径
 func TestGcm_GetUntrackedFiles(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-untracked-*"))
-	defer func() {
-		must.Done(os.RemoveAll(tempDIR))
-	}()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	gcm := gitgo.New(tempDIR)
 	gcm.Init().Done()
@@ -637,9 +598,7 @@ func TestGcm_GetUntrackedFiles(t *testing.T) {
 // 验证 GetModifiedFiles 返回更改文件路径
 func TestGcm_GetModifiedFiles(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-modified-*"))
-	defer func() {
-		must.Done(os.RemoveAll(tempDIR))
-	}()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	gcm := gitgo.New(tempDIR)
 	gcm.Init().Done()
@@ -660,9 +619,7 @@ func TestGcm_GetModifiedFiles(t *testing.T) {
 // 验证 GetIgnoredFiles 返回匹配 gitignore 规则的文件路径
 func TestGcm_GetIgnoredFiles(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-ignored-*"))
-	defer func() {
-		must.Done(os.RemoveAll(tempDIR))
-	}()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	gcm := gitgo.New(tempDIR)
 	gcm.Init().Done()
@@ -697,9 +654,7 @@ func TestGcm_GetIgnoredFiles(t *testing.T) {
 // 验证 gcm 以子路径为起点时 GetIgnoredFiles 正常工作
 func TestGcm_GetIgnoredFiles_SubPath(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-ignored-sub-path-*"))
-	defer func() {
-		must.Done(os.RemoveAll(tempDIR))
-	}()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	// Init repo at root // 在根目录初始化仓库
 	rootGcm := gitgo.New(tempDIR)
@@ -725,16 +680,14 @@ func TestGcm_GetIgnoredFiles_SubPath(t *testing.T) {
 	require.NotContains(t, paths, "main.go")
 }
 
-// TestGcm_GitCommitHash tests getting commit hash with reference
-// Verifies GitCommitHash returns hash string for tags and branches
+// TestGcm_GetCommitHash tests getting commit hash with reference
+// Verifies GetCommitHash returns hash string for tags and branches
 //
-// TestGcm_GitCommitHash 测试通过引用获取提交哈希
-// 验证 GitCommitHash 为标签和分支返回正确的哈希
-func TestGcm_GitCommitHash(t *testing.T) {
+// TestGcm_GetCommitHash 测试通过引用获取提交哈希
+// 验证 GetCommitHash 为标签和分支返回正确的哈希
+func TestGcm_GetCommitHash(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-commit-hash-*"))
-	defer func() {
-		must.Done(os.RemoveAll(tempDIR))
-	}()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	gcm := gitgo.New(tempDIR)
 	gcm.Init().Done()
@@ -743,25 +696,23 @@ func TestGcm_GitCommitHash(t *testing.T) {
 	gcm.Add().Commit("initial").Tag("v1.0.0").Done()
 
 	// Test HEAD reference // 测试 HEAD 引用
-	hashHead := rese.V1(gcm.GitCommitHash("HEAD"))
+	hashHead := rese.V1(gcm.GetCommitHash("HEAD"))
 	require.Len(t, hashHead, 40)
 	require.Regexp(t, "^[0-9a-f]{40}$", hashHead)
 
 	// Test tag reference // 测试标签引用
-	hashTag := rese.V1(gcm.GitCommitHash("v1.0.0"))
+	hashTag := rese.V1(gcm.GetCommitHash("v1.0.0"))
 	require.Equal(t, hashHead, hashTag)
 }
 
-// TestGcm_LatestGitTag_Temp tests getting latest tag in temp repo
-// Verifies LatestGitTag returns correct tag name
+// TestGcm_GetLatestTag_Temp tests getting latest tag in temp repo
+// Verifies GetLatestTag returns correct tag name
 //
-// TestGcm_LatestGitTag_Temp 测试在临时仓库获取最新标签
-// 验证 LatestGitTag 返回正确的标签名
-func TestGcm_LatestGitTag_Temp(t *testing.T) {
+// TestGcm_GetLatestTag_Temp 测试在临时仓库获取最新标签
+// 验证 GetLatestTag 返回正确的标签名
+func TestGcm_GetLatestTag_Temp(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-latest-tag-*"))
-	defer func() {
-		must.Done(os.RemoveAll(tempDIR))
-	}()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	gcm := gitgo.New(tempDIR)
 	gcm.Init().Done()
@@ -772,7 +723,9 @@ func TestGcm_LatestGitTag_Temp(t *testing.T) {
 	must.Done(os.WriteFile(filepath.Join(tempDIR, "file.txt"), []byte("v2"), 0644))
 	gcm.Add().Commit("v2").Tag("v2.0.0").Done()
 
-	tag := rese.V1(gcm.LatestGitTag())
+	tag, exists, err := gcm.GetLatestTag()
+	require.NoError(t, err)
+	require.True(t, exists)
 	require.Equal(t, "v2.0.0", tag)
 }
 
@@ -786,9 +739,7 @@ func TestGetLatestTag(t *testing.T) {
 		// Create temp DIR with git repo but no tags
 		// 创建临时目录和 git 仓库但不创建标签
 		tempDIR := rese.V1(os.MkdirTemp("", "gitgo-get-latest-tag-zero-*"))
-		defer func() {
-			must.Done(os.RemoveAll(tempDIR))
-		}()
+		t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 		gcm := gitgo.New(tempDIR)
 		gcm.Init().Done()
@@ -811,9 +762,7 @@ func TestGetLatestTag(t *testing.T) {
 		// Create temp DIR with git repo and one tag
 		// 创建临时目录、git 仓库和一个标签
 		tempDIR := rese.V1(os.MkdirTemp("", "gitgo-get-latest-tag-one-*"))
-		defer func() {
-			must.Done(os.RemoveAll(tempDIR))
-		}()
+		t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 		gcm := gitgo.New(tempDIR)
 		gcm.Init().Done()
@@ -840,9 +789,7 @@ func TestGetLatestTag(t *testing.T) {
 		// Create temp DIR with git repo and two tags
 		// 创建临时目录、git 仓库和两个标签
 		tempDIR := rese.V1(os.MkdirTemp("", "gitgo-get-latest-tag-two-*"))
-		defer func() {
-			must.Done(os.RemoveAll(tempDIR))
-		}()
+		t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 		gcm := gitgo.New(tempDIR)
 		gcm.Init().Done()
@@ -875,17 +822,15 @@ func TestGetLatestTag(t *testing.T) {
 	})
 }
 
-// TestGcm_GetBranchTrackingBranch tests getting upstream branch
-// Verifies GetBranchTrackingBranch returns correct tracking info
+// TestGcm_GetUpstreamBranch tests getting upstream branch
+// Verifies GetUpstreamBranch returns correct tracking info
 //
-// TestGcm_GetBranchTrackingBranch 测试获取上游分支
-// 验证 GetBranchTrackingBranch 返回正确的跟踪信息
-func TestGcm_GetBranchTrackingBranch(t *testing.T) {
+// TestGcm_GetUpstreamBranch 测试获取上游分支
+// 验证 GetUpstreamBranch 返回正确的跟踪信息
+func TestGcm_GetUpstreamBranch(t *testing.T) {
 	// Create remote repo // 创建远程仓库
 	remoteDIR := rese.V1(os.MkdirTemp("", "gitgo-tracking-remote-*"))
-	defer func() {
-		must.Done(os.RemoveAll(remoteDIR))
-	}()
+	t.Cleanup(func() { must.Done(os.RemoveAll(remoteDIR)) })
 	remoteGcm := gitgo.New(remoteDIR)
 	remoteGcm.Init().Done()
 	must.Done(os.WriteFile(filepath.Join(remoteDIR, "file.txt"), []byte("test"), 0644))
@@ -893,9 +838,7 @@ func TestGcm_GetBranchTrackingBranch(t *testing.T) {
 
 	// Create test repo with tracking // 创建带跟踪的本地仓库
 	localDIR := rese.V1(os.MkdirTemp("", "gitgo-tracking-local-*"))
-	defer func() {
-		must.Done(os.RemoveAll(localDIR))
-	}()
+	t.Cleanup(func() { must.Done(os.RemoveAll(localDIR)) })
 	localGcm := gitgo.New(localDIR)
 	localGcm.Init().Done()
 	must.Done(os.WriteFile(filepath.Join(localDIR, "local.txt"), []byte("local"), 0644))
@@ -911,7 +854,7 @@ func TestGcm_GetBranchTrackingBranch(t *testing.T) {
 	})
 
 	// Get tracking branch (might not exist if not set) // 尝试获取跟踪分支（如果未设置可能不存在）
-	_, err := localGcm.GetBranchTrackingBranch(currentBranch)
+	_, err := localGcm.GetUpstreamBranch(currentBranch)
 	// OK if fails (no upstream set) // 出错也可以（未设置上游）
 	t.Log("tracking branch error (expected if no upstream):", err)
 }

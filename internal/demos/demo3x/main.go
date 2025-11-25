@@ -30,7 +30,9 @@ func main() {
 	gcm.Add().Commit("v2").Tag("v1.1.0").Done()
 	zaplog.SUG.Info("tagged v1.1.0")
 
-	latest := rese.V1(gcm.LatestGitTag())
+	latest, exists, err := gcm.GetLatestTag()
+	must.Done(err)
+	must.True(exists)
 	zaplog.SUG.Info("latest tag:", latest)
 
 	count := rese.V1(gcm.GetCommitCount())

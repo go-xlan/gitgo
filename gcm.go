@@ -35,7 +35,7 @@ func (G *Gcm) Commit(m string) *Gcm {
 	return G.do("git", "commit", "-m", m) // Fails when no staged changes exist // 当没有待提交文件时会失败
 }
 
-// Fetch and merge and merges changes from the remote repo
+// Pull fetches and merges changes from the remote repo
 // Downloads recent commits from remote and integrates them into the branch
 // Use case: sync branch with remote changes when starting new work session
 //
@@ -57,15 +57,15 @@ func (G *Gcm) Push() *Gcm {
 	return G.do("git", "push")
 }
 
-// PushSetUpstreamOriginBranch pushes new branch and sets upstream tracking
+// PushWithUpstream pushes new branch and sets upstream tracking
 // Creates remote branch and establishes tracking connections to handle push and fetch
 // Use case: publish new branch to remote and enable simple push and fetch commands
 //
-// PushSetUpstreamOriginBranch 推送新分支并设置上游跟踪
+// PushWithUpstream 推送新分支并设置上游跟踪
 // 创建远程分支并建立跟踪连接以处理推送和拉取
 // 使用场景：将新分支发布到远程并启用简单的推送和拉取命令
-func (G *Gcm) PushSetUpstreamOriginBranch(newBranchName string) *Gcm {
-	return G.do("git", "push", "--set-upstream", "origin", newBranchName)
+func (G *Gcm) PushWithUpstream(branchName string) *Gcm {
+	return G.do("git", "push", "--set-upstream", "origin", branchName)
 }
 
 // Reset unstages changes and keeps them in working path
@@ -97,8 +97,8 @@ func (G *Gcm) ResetHard() *Gcm {
 // Checkout 切换到现有分支或提交
 // 更改工作路径以匹配指定分支或提交状态
 // 使用场景：在开发分支间切换或检查过去提交
-func (G *Gcm) Checkout(nameBranch string) *Gcm {
-	return G.do("git", "checkout", nameBranch)
+func (G *Gcm) Checkout(branchName string) *Gcm {
+	return G.do("git", "checkout", branchName)
 }
 
 // CheckoutNewBranch creates and switches to a new branch
@@ -108,8 +108,8 @@ func (G *Gcm) Checkout(nameBranch string) *Gcm {
 // CheckoutNewBranch 创建并切换到新分支
 // 从 HEAD 位置创建新分支并切换到该分支
 // 使用场景：开始新功能开发和创建测试分支
-func (G *Gcm) CheckoutNewBranch(nameBranch string) *Gcm {
-	return G.do("git", "checkout", "-b", nameBranch)
+func (G *Gcm) CheckoutNewBranch(branchName string) *Gcm {
+	return G.do("git", "checkout", "-b", branchName)
 }
 
 // Init initializes a new Git repo in the path
@@ -145,26 +145,37 @@ func (G *Gcm) MergeAbort() *Gcm {
 	return G.do("git", "merge", "--abort")
 }
 
-// TagList shows existing tags in the repo
+// Tags shows existing tags in the repo
 // Displays version tags and release points as a complete list
 // Use case: examine release records and find specific version tags
 //
-// TagList 显示仓库中现有标签
-// 显示版本标签和发布点的完整列表
-// 使用场景：检查发布记录和查找特定版本标签
-func (G *Gcm) TagList() *Gcm {
-	return G.do("git", "tag", "--list")
-}
-
-// Tags shows existing tags in the repo (TagList name alternative)
-// Displays version tags and release points as a complete list
-// Use case: examine release records and find specific version tags
-//
-// Tags 显示仓库中现有标签（TagList 的名称替代）
+// Tags 显示仓库中现有标签
 // 显示版本标签和发布点的完整列表
 // 使用场景：检查发布记录和查找特定版本标签
 func (G *Gcm) Tags() *Gcm {
 	return G.do("git", "tag", "--list")
+}
+
+// GetTags shows existing tags in the repo (Tags name alternative)
+// Displays version tags and release points as a complete list
+// Use case: examine release records and find specific version tags
+//
+// GetTags 显示仓库中现有标签（Tags 的名称替代）
+// 显示版本标签和发布点的完整列表
+// 使用场景：检查发布记录和查找特定版本标签
+func (G *Gcm) GetTags() *Gcm {
+	return G.Tags()
+}
+
+// TagList shows existing tags in the repo (Tags name alternative)
+// Displays version tags and release points as a complete list
+// Use case: examine release records and find specific version tags
+//
+// TagList 显示仓库中现有标签（Tags 的名称替代）
+// 显示版本标签和发布点的完整列表
+// 使用场景：检查发布记录和查找特定版本标签
+func (G *Gcm) TagList() *Gcm {
+	return G.Tags()
 }
 
 // Tag creates a new tag at the commit position
@@ -218,8 +229,8 @@ func (G *Gcm) Remote() *Gcm {
 // RemoteAdd 添加新的远程仓库连接
 // 创建对外部仓库位置的命名引用
 // 使用场景：设置与上游仓库的连接和添加分支
-func (G *Gcm) RemoteAdd(name, url string) *Gcm {
-	return G.do("git", "remote", "add", name, url)
+func (G *Gcm) RemoteAdd(name, remoteLink string) *Gcm {
+	return G.do("git", "remote", "add", name, remoteLink)
 }
 
 // RemoteRemove removes existing remote repo connection
@@ -233,14 +244,14 @@ func (G *Gcm) RemoteRemove(name string) *Gcm {
 	return G.do("git", "remote", "remove", name)
 }
 
-// RemoteSet updates URL of existing remote connection
+// RemoteSetURL updates URL of existing remote connection
 // Changes the location reference to point at new address
 // Use case: switch from HTTPS to SSH and update repo migration URLs
 //
-// RemoteSet 更新现有远程连接的 URL
+// RemoteSetURL 更新现有远程连接的 URL
 // 更改位置引用以指向新地址
 // 使用场景：从 HTTPS 切换到 SSH 和更新仓库迁移 URL
-func (G *Gcm) RemoteSet(name, remoteLink string) *Gcm {
+func (G *Gcm) RemoteSetURL(name, remoteLink string) *Gcm {
 	return G.do("git", "remote", "set-url", name, remoteLink)
 }
 

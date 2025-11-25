@@ -156,7 +156,9 @@ func main() {
 	gcm.Add().Commit("v2").Tag("v1.1.0").Done()
 	zaplog.SUG.Info("tagged v1.1.0")
 
-	latest := rese.V1(gcm.LatestGitTag())
+	latest, exists, err := gcm.GetLatestTag()
+	must.Done(err)
+	must.True(exists)
 	zaplog.SUG.Info("latest tag:", latest)
 
 	count := rese.V1(gcm.GetCommitCount())
@@ -190,17 +192,16 @@ func main() {
 
 ### 仓库状态
 
-- `HasStagingChanges() (bool, error)` - 检查暂存更改是否存在
+- `HasStagedChanges() (bool, error)` - 检查暂存更改是否存在
 - `HasUnstagedChanges() (bool, error)` - 检查未暂存更改是否存在
 - `HasChanges() (bool, error)` - 检查更改是否存在
 - `GetCommitCount() (int, error)` - 获取提交数量
-- `GitCommitHash(ref) (string, error)` - 使用引用获取提交哈希
+- `GetCommitHash(ref) (string, error)` - 使用引用获取提交哈希
 - `GetRemoteURL(remote) (string, error)` - 获取远程仓库 URL
 - `GetIgnoredFiles() ([]string, error)` - 获取 gitignore 忽略的文件
 
 ### 标签操作
 
-- `LatestGitTag() (string, error)` - 获取最新标签名称（没有标签时会失败）
 - `GetLatestTag() (string, bool, error)` - 获取最新标签名称并检查是否存在
 
 ### 问题处理

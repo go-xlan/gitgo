@@ -10,14 +10,14 @@ import (
 	"github.com/yyle88/erero"
 )
 
-// HasStagingChanges checks if staged changes are waiting to commit
+// HasStagedChanges checks if staged changes are waiting to commit
 // Returns true upon finding staged changes, false otherwise
 // Use case: avoid commit operations without staged changes to prevent issues and blank commits
 //
-// HasStagingChanges 检查是否有暂存的更改等待提交
+// HasStagedChanges 检查是否有暂存的更改等待提交
 // 在找到暂存更改时返回 true，否则返回 false
 // 使用场景：避免在没有暂存更改时执行 commit 操作，防止问题和产生空提交
-func (G *Gcm) HasStagingChanges() (bool, error) {
+func (G *Gcm) HasStagedChanges() (bool, error) {
 	_, exc, err := G.execConfig.NewConfig().WithExpectExit(1, "HAS-CHANGES").ExecTake("git", "diff-index", "--cached", "--quiet", "HEAD")
 	if err != nil {
 		return false, erero.Wro(err)
@@ -76,14 +76,14 @@ func (G *Gcm) HasChanges() (bool, error) {
 	}
 }
 
-// GetPorcelainStatus checks if uncommitted changes exist in repo
+// GetStatusPorcelain checks if uncommitted changes exist in repo
 // Returns clean status if repo has no staged and unstaged changes
 // Use case: check clean state in important operations like branch switching and releases
 //
-// GetPorcelainStatus 检查仓库中是否存在未提交的更改
+// GetStatusPorcelain 检查仓库中是否存在未提交的更改
 // 如果仓库没有已暂存和未暂存更改则返回干净状态
 // 使用场景：在分支切换和发布等关键操作期间检查干净状态
-func (G *Gcm) GetPorcelainStatus() (string, error) {
+func (G *Gcm) GetStatusPorcelain() (string, error) {
 	output, err := G.execConfig.Exec("git", "status", "--porcelain")
 	if err != nil {
 		return "", erero.Wro(err)
@@ -113,21 +113,6 @@ func (G *Gcm) CheckStagedChanges() *Gcm {
 	}
 }
 
-// LatestGitTag retrieves the name of the most recent tag in the project
-// Returns the latest tag name and issues if no tags exist with command issues
-// Uses git describe command to find the most recent annotated and lightweight tag
-//
-// LatestGitTag 获取项目中最新的标签名称
-// 如果没有标签存在和命令问题则返回问题和最新标签名称
-// 使用 git describe 命令查找最新的注释标签和轻量级标签
-func (G *Gcm) LatestGitTag() (string, error) {
-	output, err := G.execConfig.Exec("git", "describe", "--tags", "--abbrev=0")
-	if err != nil {
-		return "", erero.Wro(err) // Wrap and return failure // 包装并返回错误
-	}
-	return strings.TrimSpace(string(output)), nil
-}
-
 // GetLatestTag retrieves the latest tag name if it exists
 // Returns tag name, exists flag, and possible errors
 // When no tags exist, returns ("", false, nil)
@@ -150,14 +135,14 @@ func (G *Gcm) GetLatestTag() (string, bool, error) {
 	}
 }
 
-// LatestGitTagHasPrefix retrieves the latest tag name with the specified prefix
+// GetLatestTagHasPrefix retrieves the latest tag name with the specified prefix
 // Returns the most recent tag that starts with the given prefix
 // Helps find version tags on specific subprojects and components
 //
-// LatestGitTagHasPrefix 获取带有指定前缀的最新标签名称
+// GetLatestTagHasPrefix 获取带有指定前缀的最新标签名称
 // 返回以给定前缀开头的最新标签
 // 帮助在特定子项目和组件上查找版本标签
-func (G *Gcm) LatestGitTagHasPrefix(prefix string) (string, error) {
+func (G *Gcm) GetLatestTagHasPrefix(prefix string) (string, error) {
 	if prefix == "" {
 		return "", erero.New("prefix is required")
 	}
@@ -175,38 +160,40 @@ func (G *Gcm) LatestGitTagHasPrefix(prefix string) (string, error) {
 	return strings.TrimSpace(string(output)), nil
 }
 
-// LatestGitTagMatchRegexp retrieves the latest tag matching glob pattern
+// GetLatestTagMatchGlob retrieves the latest tag matching glob pattern
 // Returns most recent tag that matches the given glob pattern, blank if none
 // Supports wildcards in subproject and component versioning
+// Note: git tag -l uses glob (shell wildcard) patterns, not regular expressions
 //
-// LatestGitTagMatchRegexp 获取匹配 shell glob 模式的最新标签
+// GetLatestTagMatchGlob 获取匹配 shell glob 模式的最新标签
 // 返回匹配给定 glob 模式的最新标签和空字符串
 // 在子项目和组件的版本管理期间支持通配符模式
-func (G *Gcm) LatestGitTagMatchRegexp(regexpPattern string) (string, error) {
-	if regexpPattern == "" {
-		return "", erero.New("regexpPattern is required")
+// 注意：git tag -l 使用 glob（shell 通配符）模式，而非正则表达式
+func (G *Gcm) GetLatestTagMatchGlob(globPattern string) (string, error) {
+	if globPattern == "" {
+		return "", erero.New("globPattern is required")
 	}
-	// Validate pattern to prevent command injection // 验证regexpPattern安全性，避免命令注入
-	if strings.Contains(regexpPattern, "'") || strings.Contains(regexpPattern, "`") || strings.Contains(regexpPattern, "$") {
-		return "", erero.New("regexpPattern contains unsafe characters")
+	// Validate pattern to prevent command injection // 验证 globPattern 安全性，避免命令注入
+	if strings.Contains(globPattern, "'") || strings.Contains(globPattern, "`") || strings.Contains(globPattern, "$") {
+		return "", erero.New("globPattern contains unsafe characters")
 	}
 
 	// Use git tag -l with glob pattern, version desc sort, take first // 使用 git tag -l 匹配 glob 模式，按版本号降序排序，取第一个
-	output, err := G.execConfig.NewConfig().WithBash().Exec(fmt.Sprintf("git tag -l --sort=-version:refname '%s' | head -n 1", regexpPattern))
+	output, err := G.execConfig.NewConfig().WithBash().Exec(fmt.Sprintf("git tag -l --sort=-version:refname '%s' | head -n 1", globPattern))
 	if err != nil {
 		return "", erero.Wro(err)
 	}
 	return strings.TrimSpace(string(output)), nil
 }
 
-// GitCommitHash retrieves the commit hash on a specified branch and tag reference
+// GetCommitHash retrieves the commit hash on a specified branch and tag reference
 // Returns the complete commit hash string with the given reference name
 // Supports branch names, tag names, and Git references
 //
-// GitCommitHash 获取指定分支和标签引用的提交哈希
+// GetCommitHash 获取指定分支和标签引用的提交哈希
 // 返回给定引用名称的完整提交哈希字符串
 // 支持分支名、标签名和 Git 引用
-func (G *Gcm) GitCommitHash(refName string) (string, error) {
+func (G *Gcm) GetCommitHash(refName string) (string, error) {
 	if refName == "" {
 		return "", erero.New("refName is required")
 	}
@@ -217,14 +204,14 @@ func (G *Gcm) GitCommitHash(refName string) (string, error) {
 	return strings.TrimSpace(string(output)), nil
 }
 
-// SortedGitTags retrieves sorted list of project tags with dates
+// GetSortedTags retrieves sorted list of project tags with dates
 // Returns tags with creation dates sorted ascending as formatted string
 // Use case: examine tag content to choose next version numbering
 //
-// SortedGitTags 获取项目标签的排序列表及日期
+// GetSortedTags 获取项目标签的排序列表及日期
 // 返回按创建日期升序排列的标签和日期格式化字符串
 // 使用场景：检查标签内容以选择下一个版本编号
-func (G *Gcm) SortedGitTags() (string, error) {
+func (G *Gcm) GetSortedTags() (string, error) {
 	output, err := G.execConfig.Exec("git", "for-each-ref", "--sort=creatordate", "--format=%(refname) %(creatordate)", "refs/tags")
 	if err != nil {
 		return "", erero.Wro(err)
@@ -516,14 +503,14 @@ func (G *Gcm) TagExists(name string) (bool, error) {
 	}
 }
 
-// GetFileList gets tracked files in the repo
+// GetTrackedFiles gets tracked files in the repo
 // Returns paths of files tracked with Git
 // Use case: examine repo contents and validate file existence when processing assets
 //
-// GetFileList 获取仓库中的跟踪文件
+// GetTrackedFiles 获取仓库中的跟踪文件
 // 返回 Git 跟踪的文件路径
 // 使用场景：检查仓库内容并在处理资源时验证文件存在
-func (G *Gcm) GetFileList() ([]string, error) {
+func (G *Gcm) GetTrackedFiles() ([]string, error) {
 	output, err := G.execConfig.Exec("git", "ls-files")
 	if err != nil {
 		return nil, erero.Wro(err)
@@ -582,14 +569,14 @@ func (G *Gcm) GetModifiedFiles() ([]string, error) {
 	return files, nil
 }
 
-// GetBranchTrackingBranch gets the upstream branch of specified branch
+// GetUpstreamBranch gets the upstream branch of specified branch
 // Returns upstream branch name in format "remote/branch"
 // Use case: check tracking configuration and understand remote connections
 //
-// GetBranchTrackingBranch 获取指定分支的上游分支
+// GetUpstreamBranch 获取指定分支的上游分支
 // 返回格式为 "remote/branch" 的上游分支名称
 // 使用场景：验证跟踪配置和了解远程连接
-func (G *Gcm) GetBranchTrackingBranch(branch string) (string, error) {
+func (G *Gcm) GetUpstreamBranch(branch string) (string, error) {
 	output, err := G.execConfig.Exec("git", "rev-parse", "--abbrev-ref", branch+"@{upstream}")
 	if err != nil {
 		return "", erero.Wro(err)

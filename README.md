@@ -156,7 +156,9 @@ func main() {
 	gcm.Add().Commit("v2").Tag("v1.1.0").Done()
 	zaplog.SUG.Info("tagged v1.1.0")
 
-	latest := rese.V1(gcm.LatestGitTag())
+	latest, exists, err := gcm.GetLatestTag()
+	must.Done(err)
+	must.True(exists)
 	zaplog.SUG.Info("latest tag:", latest)
 
 	count := rese.V1(gcm.GetCommitCount())
@@ -190,17 +192,16 @@ func main() {
 
 ### Repo State
 
-- `HasStagingChanges() (bool, error)` - Check staged changes existence
+- `HasStagedChanges() (bool, error)` - Check staged changes existence
 - `HasUnstagedChanges() (bool, error)` - Check unstaged changes existence
 - `HasChanges() (bool, error)` - Check changes existence
 - `GetCommitCount() (int, error)` - Get commit count
-- `GitCommitHash(ref) (string, error)` - Get commit hash with reference
+- `GetCommitHash(ref) (string, error)` - Get commit hash with reference
 - `GetRemoteURL(remote) (string, error)` - Get remote repo URL
 - `GetIgnoredFiles() ([]string, error)` - Get files ignored in gitignore
 
 ### Tag Operations
 
-- `LatestGitTag() (string, error)` - Get latest tag name (fails when no tags exist)
 - `GetLatestTag() (string, bool, error)` - Get latest tag name with existence check
 
 ### Issue Handling

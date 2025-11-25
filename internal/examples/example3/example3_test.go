@@ -13,7 +13,7 @@ import (
 
 func TestBranchOperations(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-*"))
-	defer func() { must.Done(os.RemoveAll(tempDIR)) }()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	git := gitgo.New(tempDIR)
 	_, err := git.Init().Result()
@@ -47,7 +47,7 @@ func TestBranchOperations(t *testing.T) {
 
 func TestResetOperations(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-*"))
-	defer func() { must.Done(os.RemoveAll(tempDIR)) }()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	git := gitgo.New(tempDIR)
 	_, err := git.Init().Result()
@@ -62,14 +62,14 @@ func TestResetOperations(t *testing.T) {
 	_, err = git.Add().Result()
 	require.NoError(t, err)
 
-	staged, err := git.HasStagingChanges()
+	staged, err := git.HasStagedChanges()
 	require.NoError(t, err)
 	require.True(t, staged)
 
 	_, err = git.Reset().Result()
 	require.NoError(t, err)
 
-	staged, err = git.HasStagingChanges()
+	staged, err = git.HasStagedChanges()
 	require.NoError(t, err)
 	require.False(t, staged)
 
@@ -83,7 +83,7 @@ func TestResetOperations(t *testing.T) {
 
 func TestDebugOperations(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-*"))
-	defer func() { must.Done(os.RemoveAll(tempDIR)) }()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	git := gitgo.New(tempDIR).WithDebug()
 	_, err := git.Init().Result()

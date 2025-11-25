@@ -13,7 +13,7 @@ import (
 
 func TestBasicOperations(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-*"))
-	defer func() { must.Done(os.RemoveAll(tempDIR)) }()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	git := gitgo.New(tempDIR)
 	_, err := git.Init().Result()
@@ -35,7 +35,7 @@ func TestBasicOperations(t *testing.T) {
 
 func TestBranchOperations(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-*"))
-	defer func() { must.Done(os.RemoveAll(tempDIR)) }()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	git := gitgo.New(tempDIR)
 	_, err := git.Init().Result()
@@ -65,7 +65,7 @@ func TestBranchOperations(t *testing.T) {
 
 func TestLogOperations(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-*"))
-	defer func() { must.Done(os.RemoveAll(tempDIR)) }()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	git := gitgo.New(tempDIR)
 	_, err := git.Init().Result()

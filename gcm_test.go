@@ -33,7 +33,7 @@ func TestGcm_Submit(t *testing.T) {
 			Status().
 			Add().
 			WhenThen(func(gcm *gitgo.Gcm) (bool, error) {
-				return gcm.HasStagingChanges()
+				return gcm.HasStagedChanges()
 			}, func(gcm *gitgo.Gcm) *gitgo.Gcm {
 				return gcm.Commit("提交代码").Push()
 			}).
@@ -42,15 +42,13 @@ func TestGcm_Submit(t *testing.T) {
 }
 
 // TestGcm_RemoteOperations tests remote repo management operations
-// Verifies Remote, RemoteAdd, RemoteRemove, and RemoteSet functions
+// Verifies Remote, RemoteAdd, RemoteRemove, and RemoteSetURL functions
 //
 // TestGcm_RemoteOperations 测试远程仓库管理操作
-// 验证 Remote、RemoteAdd、RemoteRemove 和 RemoteSet 函数
+// 验证 Remote、RemoteAdd、RemoteRemove 和 RemoteSetURL 函数
 func TestGcm_RemoteOperations(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-remote-*"))
-	defer func() {
-		must.Done(os.RemoveAll(tempDIR))
-	}()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	gcm := gitgo.New(tempDIR)
 	gcm.Init().Done()
@@ -61,7 +59,7 @@ func TestGcm_RemoteOperations(t *testing.T) {
 	require.Contains(t, string(output), "origin")
 	require.Contains(t, string(output), "https://github.com/example/test.git")
 
-	gcm.RemoteSet("origin", "git@github.com:example/test.git").Done()
+	gcm.RemoteSetURL("origin", "git@github.com:example/test.git").Done()
 	output = gcm.Remote().Output()
 	require.Contains(t, string(output), "git@github.com")
 

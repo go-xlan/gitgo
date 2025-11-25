@@ -13,7 +13,7 @@ import (
 
 func TestTagOperations(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-*"))
-	defer func() { must.Done(os.RemoveAll(tempDIR)) }()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	git := gitgo.New(tempDIR)
 	_, err := git.Init().Result()
@@ -32,14 +32,15 @@ func TestTagOperations(t *testing.T) {
 	require.NoError(t, err)
 	require.Contains(t, string(output), tag)
 
-	latest, err := git.LatestGitTag()
+	latest, exists, err := git.GetLatestTag()
 	require.NoError(t, err)
+	require.True(t, exists)
 	require.Equal(t, tag, latest)
 }
 
 func TestTagWithPrefix(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-*"))
-	defer func() { must.Done(os.RemoveAll(tempDIR)) }()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	git := gitgo.New(tempDIR)
 	_, err := git.Init().Result()
@@ -59,18 +60,18 @@ func TestTagWithPrefix(t *testing.T) {
 	_, err = git.Tag("api/v1.0.0").Result()
 	require.NoError(t, err)
 
-	auth, err := git.LatestGitTagHasPrefix("auth/")
+	auth, err := git.GetLatestTagHasPrefix("auth/")
 	require.NoError(t, err)
 	require.Equal(t, "auth/v1.0.0", auth)
 
-	api, err := git.LatestGitTagHasPrefix("api/")
+	api, err := git.GetLatestTagHasPrefix("api/")
 	require.NoError(t, err)
 	require.Equal(t, "api/v1.0.0", api)
 }
 
 func TestCommitHash(t *testing.T) {
 	tempDIR := rese.V1(os.MkdirTemp("", "gitgo-*"))
-	defer func() { must.Done(os.RemoveAll(tempDIR)) }()
+	t.Cleanup(func() { must.Done(os.RemoveAll(tempDIR)) })
 
 	git := gitgo.New(tempDIR)
 	_, err := git.Init().Result()
@@ -81,7 +82,7 @@ func TestCommitHash(t *testing.T) {
 	_, err = git.Add().Commit("init").Result()
 	require.NoError(t, err)
 
-	head, err := git.GitCommitHash("HEAD")
+	head, err := git.GetCommitHash("HEAD")
 	require.NoError(t, err)
 	require.NotEmpty(t, head)
 	require.Len(t, head, 40)
@@ -90,7 +91,7 @@ func TestCommitHash(t *testing.T) {
 	_, err = git.Tag(tag).Result()
 	require.NoError(t, err)
 
-	hash, err := git.GitCommitHash(tag)
+	hash, err := git.GetCommitHash(tag)
 	require.NoError(t, err)
 	require.Equal(t, head, hash)
 }
