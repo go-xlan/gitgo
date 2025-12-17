@@ -606,3 +606,18 @@ func (G *Gcm) GetIgnoredFiles() ([]string, error) {
 	}
 	return paths, nil
 }
+
+// ConfigGet retrieves a configuration value from Git config
+// Executes 'git config <key>' to get specified setting
+// Use case: read user.name, user.email, and custom configuration values
+//
+// ConfigGet 从 Git 配置获取配置值
+// 执行 'git config <key>' 获取指定设置
+// 使用场景：读取 user.name、user.email 和自定义配置值
+func (G *Gcm) ConfigGet(key string) (string, error) {
+	output, err := G.execConfig.Exec("git", "config", key)
+	if err != nil {
+		return "", erero.Wro(err)
+	}
+	return strings.TrimSpace(string(output)), nil
+}

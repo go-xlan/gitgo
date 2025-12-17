@@ -6,13 +6,13 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.11.1
 	github.com/yyle88/erero v1.0.24
-	github.com/yyle88/eroticgo v0.0.5
-	github.com/yyle88/must v0.0.28
-	github.com/yyle88/osexec v0.0.34
-	github.com/yyle88/osexistpath v0.0.18
+	github.com/yyle88/eroticgo v0.0.6
+	github.com/yyle88/must v0.0.29
+	github.com/yyle88/osexec v0.0.38
+	github.com/yyle88/osexistpath v0.0.19
 	github.com/yyle88/rese v0.0.12
 	github.com/yyle88/runpath v1.0.25
-	github.com/yyle88/zaplog v0.0.27
+	github.com/yyle88/zaplog v0.0.28
 )
 
 require (
@@ -20,10 +20,10 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/yyle88/done v1.0.28 // indirect
 	github.com/yyle88/mutexmap v1.0.15 // indirect
-	github.com/yyle88/printgo v1.0.6 // indirect
+	github.com/yyle88/printgo v1.0.7 // indirect
 	github.com/yyle88/sure v0.0.42 // indirect
 	github.com/yyle88/syntaxgo v0.0.54 // indirect
-	github.com/yyle88/tern v0.0.9 // indirect
+	github.com/yyle88/tern v0.0.10 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

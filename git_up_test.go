@@ -858,3 +858,21 @@ func TestGcm_GetUpstreamBranch(t *testing.T) {
 	// OK if fails (no upstream set) // 出错也可以（未设置上游）
 	t.Log("tracking branch error (expected if no upstream):", err)
 }
+
+// TestGcm_ConfigGet tests retrieving Git config values
+// Verifies that config values can be read from Git config
+// Uses core.repositoryformatversion which exists in all Git repos
+//
+// TestGcm_ConfigGet 测试获取 Git 配置值
+// 验证可以从 Git 配置中读取配置值
+// 使用 core.repositoryformatversion 因为它在所有 Git 仓库中都存在
+func TestGcm_ConfigGet(t *testing.T) {
+	gcm := gitgo.New(runpath.PARENT.Path())
+
+	// Test with a config that always exists in any git repo
+	// 测试一个在任何 git 仓库中都存在的配置
+	repoVersion, err := gcm.ConfigGet("core.repositoryformatversion")
+	require.NoError(t, err)
+	require.NotEmpty(t, repoVersion)
+	t.Log("core.repositoryformatversion:", repoVersion)
+}
